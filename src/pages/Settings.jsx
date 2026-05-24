@@ -4,7 +4,7 @@ import { Toggle } from '../components/UI'
 import { useApp } from '../context/AppContext'
 
 export default function Settings() {
-  const { showToast } = useApp()
+  const { showToast, paymentModes, setPaymentModes, depositAccounts, setDepositAccounts, logout } = useApp()
   const [toggles, setToggles] = useState({
     emailNotif: true, smsNotif: false, autoInvoice: true,
     twofa: false, darkReports: false, weeklyDigest: true,
@@ -100,7 +100,7 @@ export default function Settings() {
                 <p className="text-sm font-semibold text-gray-800">Dilni nga sistemi</p>
                 <p className="text-xs text-gray-400 mt-0.5">Do të dilni nga paneli</p>
               </div>
-              <button className="btn btn-danger btn-sm flex items-center gap-1.5" onClick={handleLogout}>
+              <button className="btn btn-danger btn-sm flex items-center gap-1.5" onClick={logout}>
                 <LogOut size={13}/>Dilni
               </button>
             </div>
