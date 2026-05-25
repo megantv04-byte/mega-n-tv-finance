@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo } from 'react'
 import {
   Receipt, Trash2, Plus, Search, X, RefreshCw,
-  ChevronLeft, ChevronRight, Filter, Users, Wallet,
+  ChevronLeft, ChevronRight, Filter, Users, Wallet, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { EmptyState, Modal, FormGroup, Pagination } from '../components/UI'
 import { expenseTypes, depositedToOptions } from '../data/mockData'
+import ImportExcelModal from '../components/ImportExcelModal'
 
 // sort/page defaults
 
@@ -247,16 +248,32 @@ function DeleteConfirm({ exp, onClose }) {
 
 /* ══════════════════════════════════════════════════════════ */
 export default function ExpensesPage() {
-  const { expenses, setModal, closeModal, fmt } = useApp()
+  const { expenses, setExpenses, setModal, closeModal, fmt, showToast } = useApp()
 
-  const [search,     setSearch]     = useState('')
-  const [partnerFilt, setPartner]   = useState('all')
-  const [typeFilt,   setType]       = useState('all')
-  const [recurFilt,  setRecurFilt]  = useState('all')   // all | recurring | once
-  const [pg,         setPg]         = useState(1)
-  const [perPage,    setPerPage]    = useState(50)
-  const [sortField,  setSortField]  = useState('date')
-  const [sortDir,    setSortDir]    = useState('desc')
+  const [search,      setSearch]     = useState('')
+  const [partnerFilt, setPartner]    = useState('all')
+  const [typeFilt,    setType]       = useState('all')
+  const [recurFilt,   setRecurFilt]  = useState('all')
+  const [pg,          setPg]         = useState(1)
+  const [perPage,     setPerPage]    = useState(50)
+  const [sortField,   setSortField]  = useState('date')
+  const [sortDir,     setSortDir]    = useState('desc')
+  const [importOpen,  setImportOpen] = useState(false)
+
+  function handleImportExpenses(rows) {
+    setExpenses(prev => {
+      const maxNum = prev.reduce((m, e) => {
+        const n = parseInt((e.id || '').replace('EXP-','')) || 0
+        return n > m ? n : m
+      }, 0)
+      const renumbered = rows.map((r, i) => ({
+        ...r,
+        id: `EXP-${String(maxNum + i + 1).padStart(6, '0')}`,
+      }))
+      showToast(`U importuan ${renumbered.length} shpenzime`, 'success')
+      return [...prev, ...renumbered]
+    })
+  }
 
   /* unique types in data */
   const usedTypes = [...new Set(expenses.map(e => e.type).filter(Boolean))]
@@ -318,10 +335,22 @@ export default function ExpensesPage() {
           <h2 className="text-xl font-bold text-gray-800">Shpenzimet</h2>
           <p className="text-sm text-gray-400 mt-0.5">Totali: {fmt(allTotal)}</p>
         </div>
-        <button className="btn btn-primary self-start sm:self-auto btn-sm" onClick={openAdd}>
-          <Plus size={15} /> Shpenzim i ri
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button className="btn btn-outline btn-sm" onClick={() => setImportOpen(true)}>
+            <FileSpreadsheet size={15}/> Import Excel
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={openAdd}>
+            <Plus size={15} /> Shpenzim i ri
+          </button>
+        </div>
       </div>
+      {importOpen && (
+        <ImportExcelModal
+          entity="expenses"
+          onImport={handleImportExpenses}
+          onClose={() => setImportOpen(false)}
+        />
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

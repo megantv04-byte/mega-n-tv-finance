@@ -2,12 +2,13 @@ import { useState } from 'react'
 import {
   FileText, Download, Pencil, Trash2, CreditCard,
   MessageCircle, Send, XCircle, X, MessageSquare,
-  Search, Plus, LayoutList, Columns, AlertTriangle,
+  Search, Plus, LayoutList, Columns, AlertTriangle, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { StatusBadge, EmptyState, Pagination } from '../components/UI'
 import InvoiceModal from './InvoiceModal'
 import PaymentModal from './PaymentModal'
+import ImportExcelModal from '../components/ImportExcelModal'
 
 const STATUS_ORDER = { overdue: 0, pending: 1, draft: 2, paid: 3, void: 4 }
 
@@ -607,8 +608,27 @@ export default function Invoices() {
   const [perPage,      setPerPage]  = useState(50)
   const [sortField,    setSortField]= useState('id')
   const [sortDir,      setSortDir]  = useState('desc')
-  const [preview,      setPreview]  = useState(null) // invoiceId string when panel open
-  const [viewMode,     setViewMode] = useState('table') // 'table' | 'board'
+  const [preview,      setPreview]  = useState(null)
+  const [viewMode,     setViewMode] = useState('table')
+  const [importOpen,   setImportOpen] = useState(false)
+
+  function handleImportInvoices(rows) {
+    setInvoices(prev => {
+      const existingIds = new Set(prev.map(i => i.id))
+      const news = rows.filter(r => !existingIds.has(r.id))
+      // riindekso IDs për të mos pasur konflikte
+      const maxNum = prev.reduce((m, i) => {
+        const n = parseInt(i.id.replace('INV-','')) || 0
+        return n > m ? n : m
+      }, 0)
+      const renumbered = news.map((r, i) => ({
+        ...r,
+        id: `INV-${String(maxNum + i + 1).padStart(6, '0')}`,
+      }))
+      showToast(`U importuan ${renumbered.length} fatura`, 'success')
+      return [...prev, ...renumbered]
+    })
+  }
 
   const today = new Date().toISOString().slice(0, 10)
 
@@ -798,11 +818,21 @@ export default function Invoices() {
             </button>
           </div>
           <button className="btn btn-outline btn-sm"><Download size={14}/>Eksporto</button>
+          <button className="btn btn-outline btn-sm" onClick={() => setImportOpen(true)}>
+            <FileSpreadsheet size={14}/> Import Excel
+          </button>
           <button className="btn btn-primary btn-sm" onClick={() => setModal(<InvoiceModal/>)}>
             <span className="text-base leading-none">+</span> Faturë e re
           </button>
         </div>
       </div>
+      {importOpen && (
+        <ImportExcelModal
+          entity="invoices"
+          onImport={handleImportInvoices}
+          onClose={() => setImportOpen(false)}
+        />
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-4">

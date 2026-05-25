@@ -2,11 +2,12 @@ import { useState, useMemo } from 'react'
 import {
   Users, Mail, Phone, UserPlus, Search, X,
   Pencil, Monitor, Wifi, UserCheck, Globe, Filter,
-  MessageCircle, Send, LayoutGrid, User, AlertTriangle,
+  MessageCircle, Send, LayoutGrid, User, AlertTriangle, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Avatar, Modal, FormGroup, EmptyState } from '../components/UI'
 import { countries } from '../data/mockData'
+import ImportExcelModal from '../components/ImportExcelModal'
 
 const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#be185d','#0f766e']
 
@@ -415,10 +416,20 @@ function CustomerCard({ c, onEdit, fmt, isLatePayer }) {
    Faqja kryesore
 ══════════════════════════════════════════════════════════ */
 export default function Customers() {
-  const { customers, setModal, closeModal, fmt, invoices } = useApp()
-  const [search,      setSearch]      = useState('')
-  const [typeFilt,    setTypeFilt]    = useState('all')
-  const [countryFilt, setCountryFilt] = useState('all')
+  const { customers, setCustomers, setModal, closeModal, fmt, invoices, showToast } = useApp()
+  const [search,        setSearch]        = useState('')
+  const [typeFilt,      setTypeFilt]      = useState('all')
+  const [countryFilt,   setCountryFilt]   = useState('all')
+  const [importOpen,    setImportOpen]    = useState(false)
+
+  function handleImportCustomers(rows) {
+    setCustomers(prev => {
+      const existing = new Set(prev.map(c => c.name?.toLowerCase()))
+      const news = rows.filter(r => !existing.has(r.name?.toLowerCase()))
+      showToast(`U importuan ${news.length} klientë të rinj`, 'success')
+      return [...prev, ...news]
+    })
+  }
 
   const usedCountries = [...new Set(customers.map(c => c.country).filter(Boolean))]
 
@@ -469,10 +480,22 @@ export default function Customers() {
           <h2 className="text-xl font-bold text-gray-800">Klientët</h2>
           <p className="text-sm text-gray-400 mt-0.5">{customers.length} klientë aktiv</p>
         </div>
-        <button className="btn btn-primary btn-sm self-start sm:self-auto" onClick={openAdd}>
-          <UserPlus size={15}/> Shto klient
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button className="btn btn-outline btn-sm" onClick={() => setImportOpen(true)}>
+            <FileSpreadsheet size={15}/> Import Excel
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={openAdd}>
+            <UserPlus size={15}/> Shto klient
+          </button>
+        </div>
       </div>
+      {importOpen && (
+        <ImportExcelModal
+          entity="customers"
+          onImport={handleImportCustomers}
+          onClose={() => setImportOpen(false)}
+        />
+      )}
 
       {/* Mini stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
