@@ -191,27 +191,37 @@ export function AppProvider({ children }) {
         prevDA.current = defaultDepositAccounts
       }
 
-      // Organizations
-      if (orgs?.data?.length) setOrganizations(fromRows(orgs.data))
+      // Organizations — merge Supabase + mockOrganizations (kurrë mos humb ato default)
+      {
+        const supaOrgs    = orgs?.data?.length ? fromRows(orgs.data) : []
+        const supaIds     = new Set(supaOrgs.map(o => o.id))
+        const missingMock = mockOrganizations.filter(o => !supaIds.has(o.id))
+        const merged      = [...supaOrgs, ...missingMock]
+        setOrganizations(merged)
+        prevOrgs.current  = merged   // inicializo prev me gjendjen aktuale — mos aktivizo delete
+        // Nëse mungonin mock orgs, shtoji edhe në Supabase
+        if (missingMock.length)
+          supabase.from('organizations').upsert(missingMock.map(o => ({ id: o.id, data: o }))).then()
+      }
 
-      // Users — Supabase është burimi kryesor; mergon me mockUsers për fushat bazë
-      if (usrs?.data?.length) {
-        const supaUsers = fromRows(usrs.data)
+      // Users — merge Supabase + mockUsers (kurrë mos humb default users)
+      {
+        const supaUsers   = usrs?.data?.length ? fromRows(usrs.data) : []
+        // Apliko fushat bazë nga mockUsers për userat default
         const merged = supaUsers.map(u => {
           const base = mockUsers.find(m => m.id === u.id)
           if (!base) return u
           return { ...u, username: base.username, role: base.role, orgId: base.orgId, isSuperAdmin: base.isSuperAdmin }
         })
-        const supaIds = new Set(supaUsers.map(u => u.id))
-        const missing = mockUsers.filter(u => !supaIds.has(u.id))
-        const finalUsers = missing.length ? [...merged, ...missing] : merged
+        const supaIds     = new Set(supaUsers.map(u => u.id))
+        const missingMock = mockUsers.filter(u => !supaIds.has(u.id))
+        const finalUsers  = missingMock.length ? [...merged, ...missingMock] : merged
         setUsers(finalUsers)
         prevUsers.current = finalUsers
-      } else {
-        // Tabela users është bosh — ngarko nga localStorage dhe push-o në Supabase
-        prevUsers.current = _loadedUsers
-        if (_loadedUsers.length)
-          supabase.from('users').upsert(_loadedUsers.map(u => ({ id: u.id, data: u }))).then()
+        // Nëse mungonin mock users ose tabela ishte bosh, shtoji në Supabase
+        const toSeed = finalUsers.filter(u => !supaIds.has(u.id))
+        if (toSeed.length)
+          supabase.from('users').upsert(toSeed.map(u => ({ id: u.id, data: u }))).then()
       }
 
       setDbLoading(false)
@@ -275,7 +285,7 @@ export function AppProvider({ children }) {
   }, [users, isTester])
 
   // Sync organizations — ruhen nga super admin, pa kufizim org
-  const prevOrgs = useRef(mockOrganizations)
+  const prevOrgs = useRef([])
   useEffect(() => {
     if (!supabase || !isSuperAdmin) return
     if (prevOrgs.current === organizations) return
