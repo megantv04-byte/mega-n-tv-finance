@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import {
   Users, Mail, Phone, UserPlus, Search, X,
   Pencil, Monitor, Wifi, UserCheck, Globe, Filter,
   MessageCircle, Send, LayoutGrid, User, AlertTriangle, FileSpreadsheet,
+  ChevronDown,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Avatar, Modal, FormGroup, EmptyState } from '../components/UI'
@@ -15,48 +16,117 @@ const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#be
 const cleanPhone = p => (p || '').replace(/[\s\+\-\(\)]/g, '')
 
 /* ══════════════════════════════════════════════════════════
-   Dropdown "Referuar nga" me mundësi shtimi
+   Searchable combobox "Referuar nga"
 ══════════════════════════════════════════════════════════ */
 function ReferredBySelect({ value, onChange, excludeId }) {
   const { customers } = useApp()
+  const [query,  setQuery]  = useState(value || '')
+  const [open,   setOpen]   = useState(false)
+  const [active, setActive] = useState(-1)
+  const wrapRef  = useRef(null)
+  const inputRef = useRef(null)
 
+  // Mban listën e emrave të klientëve
   const names = useMemo(() =>
     customers
       .filter(c => c.id !== excludeId)
-      .map(c => c.name || `${c.firstName} ${c.lastName}`)
+      .map(c => (c.name || `${c.firstName || ''} ${c.lastName || ''}`).trim())
       .filter(Boolean)
       .sort(),
     [customers, excludeId]
   )
 
-  const isCustom = !!(value && !names.includes(value))
-  const [showCustom, setShowCustom] = useState(isCustom)
+  // Filtrimi live
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return names
+    return names.filter(n => n.toLowerCase().includes(q))
+  }, [names, query])
 
-  const handleSelect = e => {
-    const v = e.target.value
-    if (v === '__custom__') { setShowCustom(true); onChange('') }
-    else { setShowCustom(false); onChange(v) }
+  // Mbyll dropdown-in nëse klikohet jashtë
+  useEffect(() => {
+    const handler = e => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Sinkronizon query me value nga jashtë (p.sh. reset form)
+  useEffect(() => { setQuery(value || '') }, [value])
+
+  const select = name => {
+    setQuery(name)
+    onChange(name)
+    setOpen(false)
+    setActive(-1)
+  }
+
+  const clear = () => {
+    setQuery('')
+    onChange('')
+    setOpen(false)
+    inputRef.current?.focus()
+  }
+
+  const handleKey = e => {
+    if (!open) { if (e.key === 'ArrowDown' || e.key === 'Enter') setOpen(true); return }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); setActive(a => Math.min(a + 1, filtered.length - 1)) }
+    if (e.key === 'ArrowUp')    { e.preventDefault(); setActive(a => Math.max(a - 1, -1)) }
+    if (e.key === 'Enter')      { e.preventDefault(); if (active >= 0 && filtered[active]) select(filtered[active]) }
+    if (e.key === 'Escape')     { setOpen(false); setActive(-1) }
   }
 
   return (
-    <div className="space-y-2">
-      <select
-        className="form-control"
-        value={showCustom ? '__custom__' : (value || '')}
-        onChange={handleSelect}
-      >
-        <option value="">— Asnjë —</option>
-        {names.map(n => <option key={n} value={n}>{n}</option>)}
-        <option value="__custom__">+ Shto person tjetër...</option>
-      </select>
-      {showCustom && (
+    <div ref={wrapRef} className="relative">
+      {/* Input */}
+      <div className="relative flex items-center">
+        <Search size={14} className="absolute left-3 text-gray-400 pointer-events-none" />
         <input
-          className="form-control text-sm"
-          placeholder="Shkruaj emrin e personit referues..."
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          autoFocus
+          ref={inputRef}
+          className="form-control pl-8 pr-8"
+          placeholder="Kërko person referues..."
+          value={query}
+          onChange={e => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); setActive(-1) }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKey}
+          autoComplete="off"
         />
+        {query
+          ? <button type="button" onClick={clear} className="absolute right-3 text-gray-300 hover:text-gray-500"><X size={13}/></button>
+          : <ChevronDown size={13} className="absolute right-3 text-gray-300 pointer-events-none"/>
+        }
+      </div>
+
+      {/* Dropdown list */}
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-52 overflow-y-auto">
+          {/* Opsioni "asnjë" */}
+          <div
+            className="px-3 py-2 text-xs text-gray-400 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
+            onMouseDown={() => select('')}
+          >
+            — Asnjë —
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="px-3 py-3 text-xs text-gray-400 text-center">Nuk u gjet asnjë klient</div>
+          ) : (
+            filtered.map((name, i) => (
+              <div
+                key={name}
+                className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors ${
+                  i === active ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50 text-gray-700'
+                }`}
+                onMouseDown={() => select(name)}
+                onMouseEnter={() => setActive(i)}
+              >
+                <UserCheck size={12} className="text-gray-300 flex-shrink-0"/>
+                {name}
+              </div>
+            ))
+          )}
+        </div>
       )}
     </div>
   )
