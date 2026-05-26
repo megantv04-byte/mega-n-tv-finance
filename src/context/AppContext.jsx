@@ -97,8 +97,8 @@ export function AppProvider({ children }) {
 
   /* ── Filter data by organization ── */
   const filterByOrg = (data) => {
-    if (!currentOrgId) return []  // Nëse nuk ka user, asnjë të dhënë
     if (isSuperAdmin) return data  // Superadmin sheh të gjithçka
+    if (!currentOrgId) return data  // Nëse nuk ka user, shfaq të gjitha (mockData)
     // Filtro vetëm të dhënat e organizatës aktuale
     return data.filter(item => (item.orgId === currentOrgId || !item.orgId))
   }
