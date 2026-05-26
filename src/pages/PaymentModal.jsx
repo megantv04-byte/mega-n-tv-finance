@@ -376,24 +376,20 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
         </div>
       )}
 
-      {/* Depozituar tek — partner toggle */}
+      {/* Depozituar tek — dropdown */}
       <FormGroup label="Depozituar tek *">
-        <div className="flex gap-3">
+        <select
+          className="form-control"
+          value={form.depositedTo}
+          onChange={e => set('depositedTo', e.target.value)}
+        >
+          <option value="">— Zgjidh ku depozitohet —</option>
           {depositedToOptions.map(opt => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => set('depositedTo', opt)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
-                form.depositedTo === opt
-                  ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-500 hover:border-blue-300'
-              }`}
-            >
+            <option key={opt} value={opt}>
               👤 {opt}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
       </FormGroup>
 
       {/* Shënime */}
