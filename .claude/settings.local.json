@@ -37,7 +37,8 @@
       "Bash(cp /tmp/clear_invoices.js .)",
       "Bash(VITE_SUPABASE_URL='https://zssasbllfjeaailfteep.supabase.co' VITE_SUPABASE_KEY='sb_publishable_RmkUSCdjd71U6_gYlkb7Nw_Of8u4QLx' node clear_invoices.js)",
       "Bash(node import_zoho.js)",
-      "Bash(rm -f set_notify_dates.js verify_notify.js verify_merge.js import_zoho*.js test_insert.js test_minimal.js check_schema.js clear_invoices.js import_zoho.js && ls *.js 2>/dev/null | wc -l)"
+      "Bash(rm -f set_notify_dates.js verify_notify.js verify_merge.js import_zoho*.js test_insert.js test_minimal.js check_schema.js clear_invoices.js import_zoho.js && ls *.js 2>/dev/null | wc -l)",
+      "Bash(curl -s -H \"Authorization: token $\\(git config --global user.github-token || echo 'no-token'\\)\" https://api.github.com/repos/megashtv-coder/XFlow/actions/runs?branch=main)"
     ]
   }
 }

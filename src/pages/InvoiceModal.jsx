@@ -380,7 +380,7 @@ function monthsToDays(m) {
    InvoiceModal
 ══════════════════════════════════════════════════════════ */
 export default function InvoiceModal({ initialData }) {
-  const { customers, setCustomers, items: products, setInvoices, showToast, closeModal } = useApp()
+  const { invoices, customers, setCustomers, items: products, setInvoices, showToast, closeModal } = useApp()
 
   const isEdit = !!(initialData?.id)
   const due3d  = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
@@ -469,6 +469,22 @@ export default function InvoiceModal({ initialData }) {
     setAddingCustomer(null)
   }
 
+  /* ── Generate next sequential invoice number ── */
+  const generateNextInvoiceId = () => {
+    // Find the highest invoice number currently in use
+    let maxNum = 0
+    invoices.forEach(inv => {
+      const match = inv.id.match(/INV-(\d+)/)
+      if (match) {
+        const num = parseInt(match[1], 10)
+        if (num > maxNum) maxNum = num
+      }
+    })
+    // Increment and format as 6-digit number
+    const nextNum = maxNum + 1
+    return `INV-${String(nextNum).padStart(6, '0')}`
+  }
+
   /* ── Save ── */
   const save = () => {
     const validItems = lineItems.filter(it => Number(it.unitPrice) > 0)
@@ -503,7 +519,7 @@ export default function InvoiceModal({ initialData }) {
     } else {
       setInvoices(p => [{
         ...payload,
-        id:       `INV-${String(Date.now()).slice(-4)}`,
+        id:       generateNextInvoiceId(),
         date:     new Date().toISOString().slice(0, 10),
         comments: [],
       }, ...p])
