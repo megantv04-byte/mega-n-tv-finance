@@ -572,12 +572,25 @@ export default function InvoiceModal({ initialData }) {
 
       {/* ── Referenti (Sales Person) ── */}
       <FormGroup label="Referenti (Përfaqësuesi)">
-        <input
-          className="form-control"
-          type="text"
+        <Combobox
+          options={[
+            // Get unique referents from existing invoices
+            ...Array.from(new Set(
+              invoices
+                .filter(inv => inv.referent && inv.referent.trim())
+                .map(inv => inv.referent.trim())
+            )).map(ref => ({ id: ref, name: ref }))
+          ]}
           value={form.referent}
-          onChange={e => set('referent', e.target.value)}
-          placeholder="Emri i personit referues..."
+          onChange={ref => set('referent', typeof ref === 'string' ? ref : ref.name)}
+          placeholder="Zgjedh referentin..."
+          getKey={ref => ref.id}
+          getLabel={ref => ref.name}
+          renderOption={ref => (
+            <span className="text-sm text-gray-800">{ref.name}</span>
+          )}
+          onAddNew={name => set('referent', name)}
+          addNewLabel="Shto referent të ri"
         />
       </FormGroup>
 

@@ -651,7 +651,13 @@ export default function Invoices() {
     if (statusFilter !== 'all' && i.status !== statusFilter) return false
     if (typeFilter === 'reseller'   && getCustomerType(i.customer) !== 'reseller')   return false
     if (typeFilter === 'individual' && getCustomerType(i.customer) === 'reseller')    return false
-    if (search && !i.customer.toLowerCase().includes(search.toLowerCase()) && !i.id.includes(search)) return false
+    if (search) {
+      const searchLower = search.toLowerCase()
+      const matchCustomer = i.customer.toLowerCase().includes(searchLower)
+      const matchId = i.id.includes(search)
+      const matchReferent = i.referent && i.referent.toLowerCase().includes(searchLower)
+      if (!matchCustomer && !matchId && !matchReferent) return false
+    }
     return true
   })
 
