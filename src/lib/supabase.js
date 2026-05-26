@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Supabase credentials (hardcoded — public anon key is safe)
+const url = 'https://zssasbllfjeaailfteep.supabase.co'
+const key = 'sb_publishable_RmkUSCdjd71U6_gYlkb7Nw_Of8u4QLx'
 
-// Returns null if env vars not configured — app falls back to mock data
-export const supabase = (url && key) ? createClient(url, key) : null
+// Always connect to Supabase
+export const supabase = createClient(url, key)
