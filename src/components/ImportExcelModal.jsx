@@ -53,6 +53,7 @@ const MAPS = {
       { key: 'due',               aliases: ['skadenca', 'due', 'due date', 'data skadencës', 'data per pagese'] },
       { key: 'amount',            aliases: ['shuma', 'amount', 'total', 'vlera'] },
       { key: 'status',            aliases: ['statusi', 'status', 'gjendje'] },
+      { key: 'referent',          aliases: ['referenti', 'referent', 'sales person', 'person referues', 'salesperson'] },
       { key: 'item',              aliases: ['produkti', 'shërbimi', 'item', 'përshkrimi', 'sherbimi'] },
       { key: 'qty',               aliases: ['sasia', 'qty', 'quantity', 'sasi'] },
       { key: 'price',             aliases: ['çmimi', 'price', 'cmimi'] },
@@ -88,6 +89,7 @@ const MAPS = {
           ? String(row.invoiceId).trim().toUpperCase()
           : `INV-${String(Date.now() + idx).padStart(6,'0').slice(-6).padStart(6,'0')}`,
         customer:            row.customer || '',
+        referent:            row.referent || '',
         country:             '',
         email:               '',
         amount:              parseFloat(row.amount) || 0,

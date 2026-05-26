@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   FileText, Download, Pencil, Trash2, CreditCard,
   MessageCircle, Send, XCircle, X, MessageSquare,
   Search, Plus, LayoutList, Columns, AlertTriangle, FileSpreadsheet,
+  MoreVertical, Edit3, Eye,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { StatusBadge, EmptyState, Pagination } from '../components/UI'
@@ -621,6 +622,7 @@ export default function Invoices() {
   const [preview,      setPreview]  = useState(null)
   const [viewMode,     setViewMode] = useState('table')
   const [importOpen,   setImportOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState(null) // Track which row's dropdown is open
 
   const getCustomerType = name =>
     customers.find(c => c.name === name)?.type || 'individual'
@@ -672,6 +674,13 @@ export default function Invoices() {
     const c = customers.find(c => c.name === name)
     return c?.phone || ''
   }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenDropdown(null)
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
 
   /* ── SPLIT LAYOUT (when a preview is selected) ── */
   if (preview) {
@@ -939,6 +948,7 @@ export default function Invoices() {
                     {[
                       { key: 'id',       label: 'ID',     cls: '' },
                       { key: 'customer', label: 'Klienti',cls: '' },
+                      { key: 'referent', label: 'Referenti', cls: 'hidden sm:table-cell' },
                     ].map(col => (
                       <th key={col.key} className={`table-th cursor-pointer select-none hover:text-blue-600 ${col.cls}`}
                           onClick={() => toggleSort(col.key)}>
@@ -974,6 +984,7 @@ export default function Invoices() {
                     const isOverdue  = inv.status === 'overdue' ||
                       (inv.due && inv.due < today && inv.status !== 'paid' && inv.status !== 'void')
                     const msg = canContact ? encodeURIComponent(buildReminderMsg(inv)) : ''
+                    const isDropdownOpen = openDropdown === inv.id
 
                     return (
                       <tr
@@ -990,50 +1001,115 @@ export default function Invoices() {
                             )}
                           </div>
                         </td>
+                        <td className="table-td text-gray-600 hidden sm:table-cell text-sm">
+                          {inv.referent ? (
+                            <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                              {inv.referent}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300 italic text-xs">-</span>
+                          )}
+                        </td>
                         <td className="table-td text-gray-400 hidden md:table-cell">{inv.date}</td>
                         <td className={`table-td hidden lg:table-cell ${isOverdue ? 'text-red-500 font-semibold' : 'text-gray-400'}`}>
                           {inv.due}
                         </td>
                         <td className="table-td font-bold text-gray-800">{fmt(inv.amount)}</td>
                         <td className="table-td"><StatusBadge status={inv.status}/></td>
-                        <td className="table-td" onClick={e => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {canContact && (
-                              <a
-                                href={`https://wa.me/${rawPhone}?text=${msg}`}
-                                target="_blank" rel="noopener noreferrer"
-                                className={`icon-btn ${isOverdue ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50'}`}
-                                title="WhatsApp rikujtim"
-                              >
-                                <MessageCircle size={14}/>
-                              </a>
-                            )}
-                            {canContact && (
-                              <a
-                                href={`https://t.me/+${rawPhone}`}
-                                target="_blank" rel="noopener noreferrer"
-                                className="icon-btn text-sky-500 hover:bg-sky-50"
-                                title="Telegram"
-                              >
-                                <Send size={14}/>
-                              </a>
-                            )}
-                            {(inv.status === 'pending' || inv.status === 'overdue') && (
+                        <td className="table-td relative" onClick={e => e.stopPropagation()}>
+                          <div className="flex items-center justify-end">
+                            <div className="relative">
                               <button
-                                className="icon-btn text-emerald-500 hover:bg-emerald-50"
-                                title="Regjistro Pagesën"
-                                onClick={() => setModal(<PaymentModal invoice={inv} onClose={closeModal}/>)}
+                                className="icon-btn text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                                title="Veprimet"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  setOpenDropdown(isDropdownOpen ? null : inv.id)
+                                }}
                               >
-                                <CreditCard size={14}/>
+                                <MoreVertical size={16}/>
                               </button>
-                            )}
-                            <button
-                              className="icon-btn text-red-400 hover:bg-red-50 hover:text-red-600"
-                              title="Fshi"
-                              onClick={() => { setInvoices(p => p.filter(i => i.id !== inv.id)); showToast('Fatura u fshi') }}
-                            >
-                              <Trash2 size={14}/>
-                            </button>
+
+                              {/* Dropdown Menu */}
+                              {isDropdownOpen && (
+                                <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                  <button
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      setModal(<InvoiceModal initialData={inv}/>)
+                                      setOpenDropdown(null)
+                                    }}
+                                  >
+                                    <Pencil size={14}/> Ndrysho
+                                  </button>
+
+                                  <button
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      setPreview(inv.id)
+                                      setOpenDropdown(null)
+                                    }}
+                                  >
+                                    <Eye size={14}/> Shiko detajet
+                                  </button>
+
+                                  {canContact && (
+                                    <a
+                                      href={`https://wa.me/${rawPhone}?text=${msg}`}
+                                      target="_blank" rel="noopener noreferrer"
+                                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-green-50 flex items-center gap-2 border-b border-gray-100 ${isOverdue ? 'text-orange-600' : 'text-green-600'}`}
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        setOpenDropdown(null)
+                                      }}
+                                    >
+                                      <MessageCircle size={14}/> WhatsApp {isOverdue && '🔔'}
+                                    </a>
+                                  )}
+
+                                  {canContact && (
+                                    <a
+                                      href={`https://t.me/+${rawPhone}`}
+                                      target="_blank" rel="noopener noreferrer"
+                                      className="block w-full text-left px-4 py-2 text-sm text-sky-600 hover:bg-sky-50 flex items-center gap-2 border-b border-gray-100"
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        setOpenDropdown(null)
+                                      }}
+                                    >
+                                      <Send size={14}/> Telegram
+                                    </a>
+                                  )}
+
+                                  {(inv.status === 'pending' || inv.status === 'overdue') && (
+                                    <button
+                                      className="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 border-b border-gray-100"
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        setModal(<PaymentModal invoice={inv} onClose={closeModal}/>)
+                                        setOpenDropdown(null)
+                                      }}
+                                    >
+                                      <CreditCard size={14}/> Regjistro Pagesën
+                                    </button>
+                                  )}
+
+                                  <button
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      setInvoices(p => p.filter(i => i.id !== inv.id))
+                                      showToast('Fatura u fshi')
+                                      setOpenDropdown(null)
+                                    }}
+                                  >
+                                    <Trash2 size={14}/> Fshi
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
                       </tr>

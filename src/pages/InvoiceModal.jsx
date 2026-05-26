@@ -406,6 +406,7 @@ export default function InvoiceModal({ initialData }) {
 
   const [form, setForm] = useState({
     customer:           initialData?.customer           || '',
+    referent:           initialData?.referent           || '',
     due:                initialData?.due                || due3d,
     subscriptionExpiry: initialData?.subscriptionExpiry || '',
     notifyDate:         initialData?.notifyDate         || '',
@@ -484,6 +485,7 @@ export default function InvoiceModal({ initialData }) {
     const custObj = customers.find(c => c.name === form.customer)
     const payload = {
       customer:           form.customer,
+      referent:           form.referent,
       country:            custObj?.country || '',
       email:              custObj?.email   || '',
       amount:             total,
@@ -549,6 +551,17 @@ export default function InvoiceModal({ initialData }) {
           )}
           onAddNew={handleAddNewCustomer}
           addNewLabel="Shto klient të ri"
+        />
+      </FormGroup>
+
+      {/* ── Referenti (Sales Person) ── */}
+      <FormGroup label="Referenti (Përfaqësuesi)">
+        <input
+          className="form-control"
+          type="text"
+          value={form.referent}
+          onChange={e => set('referent', e.target.value)}
+          placeholder="Emri i personit referues..."
         />
       </FormGroup>
 
