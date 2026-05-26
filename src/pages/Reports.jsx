@@ -9,6 +9,7 @@ import {
   ResponsiveContainer, LineChart, Line, ComposedChart, Cell,
 } from 'recharts'
 import { useApp } from '../context/AppContext'
+import { useFeatures } from '../features/useFeatures'
 
 /* ─── konstante ─── */
 const MONTHS_SQ  = ['Jan','Shk','Mar','Pri','Maj','Qer','Kor','Gus','Sht','Tet','Nën','Dhj']
@@ -1013,16 +1014,25 @@ function ReferuesitTab() {
 ══════════════════════════════════════════════════════════ */
 export default function Reports() {
   const { invoices, expenses, payments, fmt } = useApp()
+  const { canUsePartnerSettlement } = useFeatures()
   const [mainTab, setMainTab] = useState('financiare')
 
-  const MAIN_TABS = [
+  const ALL_MAIN_TABS = [
     { id: 'financiare', label: 'Financiare',        icon: TrendingUp },
-    { id: 'barazimi',   label: 'Barazimi Partnerësh', icon: Scale     },
+    { id: 'barazimi',   label: 'Barazimi Partnerësh', icon: Scale,     restricted: true },
     { id: 'klientet',   label: 'Klientët Mujore',   icon: Users      },
     { id: 'shtetet',    label: 'Shtetet',            icon: Globe      },
     { id: 'abonente',   label: 'Abonentët',          icon: Clock      },
     { id: 'referuesit', label: 'Referuesit',         icon: Share2     },
   ]
+
+  // Filter tabs based on feature availability
+  const MAIN_TABS = ALL_MAIN_TABS.filter(tab => {
+    if (tab.restricted && !canUsePartnerSettlement) {
+      return false
+    }
+    return true
+  })
 
   return (
     <div className="space-y-4">

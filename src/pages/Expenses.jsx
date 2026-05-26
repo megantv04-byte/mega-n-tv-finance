@@ -4,6 +4,7 @@ import {
   ChevronLeft, ChevronRight, Filter, Users, Wallet, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useFeatures } from '../features/useFeatures'
 import { EmptyState, Modal, FormGroup, Pagination } from '../components/UI'
 import { expenseTypes, depositedToOptions } from '../data/mockData'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
@@ -62,6 +63,7 @@ function SlideSelect({ value, onChange, options, placeholder = 'Zgjidh llogarin�
 /* ── Modal shpenzimi ── */
 export function ExpenseModal({ expense, onClose }) {
   const { setExpenses, depositAccounts, showToast } = useApp()
+  const { canUsePartnerExpenseFields } = useFeatures()
   const isEdit = !!expense
   const today = new Date().toISOString().slice(0, 10)
 
@@ -146,15 +148,17 @@ export function ExpenseModal({ expense, onClose }) {
           placeholder="Emri i furnitorit / kompanisë..." />
       </FormGroup>
 
-      {/* Nga cila llogari */}
-      <FormGroup label="Nga cila llogari u pagua">
-        <SlideSelect
-          value={form.paidFrom}
-          onChange={v => set('paidFrom', v)}
-          options={depositAccounts}
-          placeholder="Zgjidh llogarinë nga e cila u pagua..."
-        />
-      </FormGroup>
+      {/* Nga cila llogari - Only for organizations with partner expense feature enabled */}
+      {canUsePartnerExpenseFields && (
+        <FormGroup label="Nga cila llogari u pagua">
+          <SlideSelect
+            value={form.paidFrom}
+            onChange={v => set('paidFrom', v)}
+            options={depositAccounts}
+            placeholder="Zgjidh llogarinë nga e cila u pagua..."
+          />
+        </FormGroup>
+      )}
 
       {/* Referenca */}
       <FormGroup label="Referenca / Shënime">
@@ -163,21 +167,23 @@ export function ExpenseModal({ expense, onClose }) {
           placeholder="Çdo shënim shtesë..." />
       </FormGroup>
 
-      {/* Partneri */}
-      <FormGroup label="Nga cili partner u bë shpenzimi *">
-        <div className="flex gap-3">
-          {depositedToOptions.map(opt => (
-            <button key={opt} type="button" onClick={() => set('paidBy', opt)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
-                form.paidBy === opt
-                  ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-500 hover:border-blue-300'
-              }`}>
-              👤 {opt}
-            </button>
-          ))}
-        </div>
-      </FormGroup>
+      {/* Partneri - Only for organizations with partner expense feature enabled */}
+      {canUsePartnerExpenseFields && (
+        <FormGroup label="Nga cili partner u bë shpenzimi *">
+          <div className="flex gap-3">
+            {depositedToOptions.map(opt => (
+              <button key={opt} type="button" onClick={() => set('paidBy', opt)}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                  form.paidBy === opt
+                    ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-500 hover:border-blue-300'
+                }`}>
+                👤 {opt}
+              </button>
+            ))}
+          </div>
+        </FormGroup>
+      )}
 
       {/* Recurring */}
       <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">

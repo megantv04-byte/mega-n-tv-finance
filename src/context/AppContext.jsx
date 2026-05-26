@@ -6,6 +6,8 @@ import {
   currencies, mockUsers, mockActivityLog, mockOrganizations,
 } from '../data/mockData'
 import { supabase } from '../lib/supabase'
+import DataMigration from '../services/data/DataMigration'
+import { guardRoute, logAccessDenial } from '../middleware/featureRouteGuard'
 
 const AppContext = createContext(null)
 
@@ -187,6 +189,8 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!supabase) {
       // Pa Supabase — përdor mock data
+      console.log('📊 Loading invoices from mockData:', mockInvoices.length, 'invoices')
+      console.log('🆕 First invoice:', mockInvoices[0])
       setInvoices(mockInvoices);        prevInvoices.current  = mockInvoices
       setCustomers(mockCustomers);      prevCustomers.current = mockCustomers
       setExpenses(mockExpenses);        prevExpenses.current  = mockExpenses
@@ -294,6 +298,24 @@ export function AppProvider({ children }) {
         const toSeed = finalUsers.filter(u => !supaIds.has(u.id))
         if (toSeed.length)
           supabase.from('users').upsert(toSeed.map(u => ({ id: u.id, data: u }))).then()
+      }
+
+      // MIGRATION: Ensure all records have orgId (critical for data isolation)
+      if (supabase) {
+        const migration = new DataMigration(supabase)
+        migration.checkStatus().then(status => {
+          const needsMigration = Object.values(status).some(t => t.needsMigration)
+          if (needsMigration) {
+            console.warn('[AppContext] Data migration needed — some records missing orgId')
+            console.log('[AppContext] Migration status:', status)
+            // Auto-run migration silently to fix data isolation
+            migration.migrateAllData('ORG-001').catch(err => {
+              console.error('[AppContext] Migration failed:', err)
+            })
+          }
+        }).catch(err => {
+          console.error('[AppContext] Failed to check migration status:', err)
+        })
       }
 
       setDbLoading(false)
@@ -446,7 +468,10 @@ export function AppProvider({ children }) {
   const logout = useCallback(() => {
     setCurrentUser(null)
     setPage('dashboard')
+    // Clear both AppContext and TenantContext
     localStorage.removeItem('xflow_page')
+    localStorage.removeItem('xflow_user')
+    localStorage.removeItem('xflow_session')
   }, [])
 
   /* ── Log activity ── */
@@ -469,12 +494,29 @@ export function AppProvider({ children }) {
   }, [])
 
   const navigate = useCallback((p) => {
+    // Guard route access based on features
+    const guardResult = guardRoute({
+      route: p,
+      orgId: currentOrgId,
+    })
+
+    if (!guardResult.allowed) {
+      logAccessDenial({ route: p, orgId: currentOrgId }, guardResult.reason || 'Access denied')
+      // Show toast and redirect to allowed page
+      setToast({ msg: 'Ky modul nuk është në dispozicion për organizatën tuaj.', type: 'error' })
+      if (guardResult.redirectTo) {
+        setPage(guardResult.redirectTo)
+        localStorage.setItem('xflow_page', guardResult.redirectTo)
+      }
+      return
+    }
+
     setPage(p)
     localStorage.setItem('xflow_page', p)
     setSidebarOpen(false)
     setLoading(true)
     setTimeout(() => setLoading(false), 350)
-  }, [])
+  }, [currentOrgId])
 
   const fmt = useCallback(
     (amount) => currency.symbol + new Intl.NumberFormat('de-DE', {

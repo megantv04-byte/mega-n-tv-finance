@@ -231,64 +231,64 @@ function OrgDetailPanel({ org, onClose }) {
   return (
     <div className="fixed inset-0 z-40 flex items-start justify-end">
       <div className="absolute inset-0 bg-black/20" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-900 w-full max-w-md h-full shadow-2xl flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+      <div className="relative bg-white dark:bg-gray-900 w-full max-w-sm h-full shadow-2xl flex flex-col overflow-hidden">
+        {/* Header - responsive */}
+        <div className="flex items-center justify-between p-3 sm:p-5 border-b border-gray-100 dark:border-gray-800 gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0"
               style={{ background: org.color }}>
               {org.shortName?.slice(0,2)}
             </div>
-            <div>
-              <p className="font-bold text-gray-900 dark:text-white">{org.name}</p>
+            <div className="min-w-0 flex-1">
+              <p className="font-bold text-gray-900 dark:text-white text-sm truncate">{org.name}</p>
               <p className="text-xs text-gray-400">{orgUsers.length} përdorues</p>
             </div>
           </div>
-          <button onClick={onClose} className="icon-btn"><X size={18}/></button>
+          <button onClick={onClose} className="icon-btn flex-shrink-0"><X size={18}/></button>
         </div>
 
-        {/* Users list */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <div className="flex items-center justify-between mb-4">
+        {/* Users list - responsive */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 mb-4">
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Përdoruesit</p>
             <button
-              className="btn btn-primary btn-sm text-xs"
+              className="btn btn-primary btn-sm text-xs self-start"
               onClick={() => setModal(<AddUserToOrgModal org={org} onClose={closeModal}/>)}
             >
-              <UserPlus size={13}/> Shto
+              <UserPlus size={13}/> <span className="hidden xs:inline">Shto</span>
             </button>
           </div>
 
           {orgUsers.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
-              <Users size={32} className="mx-auto mb-2 opacity-30" />
+              <Users size={28} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm">Nuk ka përdorues</p>
             </div>
           ) : (
             <div className="space-y-2">
               {orgUsers.map(u => (
-                <div key={u.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                <div key={u.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg sm:rounded-xl">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                     style={{ background: u.color || '#2563eb' }}>
                     {u.name?.slice(0,2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{u.name}</p>
-                      {u.isSuperAdmin && <Crown size={11} className="text-amber-500" title="Super Admin"/>}
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <p className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">{u.name}</p>
+                      {u.isSuperAdmin && <Crown size={10} className="text-amber-500 flex-shrink-0" title="Super Admin"/>}
                     </div>
-                    <p className="text-xs text-gray-400">@{u.username}</p>
+                    <p className="text-xs text-gray-400 truncate">@{u.username}</p>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${ROLE_META[u.role]?.cls || ''}`}>
+                  <span className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium flex-shrink-0 whitespace-nowrap ${ROLE_META[u.role]?.cls || ''}`}>
                     {ROLE_META[u.role]?.label || u.role}
                   </span>
                   {!u.isSuperAdmin && (
                     <button
-                      className="icon-btn text-red-400 hover:bg-red-50 flex-shrink-0"
+                      className="icon-btn text-red-400 hover:bg-red-50 flex-shrink-0 p-1"
                       title="Hiq nga org"
                       onClick={() => removeUser(u.id)}
                     >
-                      <X size={14}/>
+                      <X size={13}/>
                     </button>
                   )}
                 </div>
@@ -315,38 +315,45 @@ export default function OrgManager() {
   const totalUsers = users.filter(u => !u.isSuperAdmin || u.orgId).length
 
   return (
-    <div>
+    <div className="w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-            <Building2 size={22} className="text-blue-500" />
-            Menaxhimi i Organizatave
+        <div className="min-w-0 flex-1">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2 truncate">
+            <Building2 size={20} className="text-blue-500 flex-shrink-0" />
+            <span className="truncate">Menaxhimi i Organizatave</span>
           </h2>
-          <p className="text-sm text-gray-400 mt-0.5">{organizations.length} organizata · {totalUsers} përdorues gjithsej</p>
+          <p className="text-xs sm:text-sm text-gray-400 mt-0.5 truncate">{organizations.length} organizata · {totalUsers} përdorues gjithsej</p>
         </div>
-        <button className="btn btn-primary btn-sm self-start sm:self-auto" onClick={openCreate}>
-          <Plus size={16}/> Organizatë e re
+        <button
+          type="button"
+          className="btn btn-primary btn-sm self-start sm:self-auto flex-shrink-0 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
+          onClick={() => {
+            console.log('Opening create org modal')
+            openCreate()
+          }}
+        >
+          <Plus size={16}/> <span className="hidden xs:inline">Organizatë e re</span><span className="inline xs:hidden">E re</span>
         </button>
       </div>
 
-      {/* Stat strip */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 px-5 py-4">
-          <p className="text-2xl font-bold text-gray-800 dark:text-white">{organizations.length}</p>
+      {/* Stat strip - responsive */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-gray-100 dark:border-gray-700 px-3 sm:px-5 py-3 sm:py-4">
+          <p className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">{organizations.length}</p>
           <p className="text-xs text-gray-400 mt-0.5">Organizata</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 px-5 py-4">
-          <p className="text-2xl font-bold text-green-600">{organizations.filter(o => o.status === 'active').length}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-gray-100 dark:border-gray-700 px-3 sm:px-5 py-3 sm:py-4">
+          <p className="text-lg sm:text-2xl font-bold text-green-600">{organizations.filter(o => o.status === 'active').length}</p>
           <p className="text-xs text-gray-400 mt-0.5">Aktive</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 px-5 py-4">
-          <p className="text-2xl font-bold text-blue-600">{totalUsers}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-gray-100 dark:border-gray-700 px-3 sm:px-5 py-3 sm:py-4 col-span-2 sm:col-span-1">
+          <p className="text-lg sm:text-2xl font-bold text-blue-600">{totalUsers}</p>
           <p className="text-xs text-gray-400 mt-0.5">Përdorues</p>
         </div>
       </div>
 
-      {/* Orgs grid */}
+      {/* Orgs grid - fully responsive */}
       {organizations.length === 0 ? (
         <EmptyState
           icon={Building2}
@@ -355,49 +362,49 @@ export default function OrgManager() {
           action={<button className="btn btn-primary mt-2" onClick={openCreate}><Plus size={14}/> Krijo</button>}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {organizations.map(org => {
             const orgUsers = users.filter(u => u.orgId === org.id)
             return (
               <div key={org.id}
-                className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden"
+                className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col overflow-hidden"
               >
                 {/* Color bar */}
-                <div className="h-1.5 w-full" style={{ background: org.color }} />
+                <div className="h-1 sm:h-1.5 w-full" style={{ background: org.color }} />
 
-                <div className="p-5 flex-1">
-                  {/* Top row */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-sm"
+                <div className="p-3 sm:p-5 flex-1">
+                  {/* Top row - responsive */}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 mb-3">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl flex items-center justify-center text-white font-black text-xs sm:text-sm shadow-sm flex-shrink-0"
                         style={{ background: org.color }}>
                         {org.shortName?.slice(0,2) || org.name?.slice(0,2)}
                       </div>
-                      <div>
-                        <p className="font-bold text-gray-900 dark:text-white text-sm leading-tight">{org.name}</p>
-                        <p className="text-xs text-gray-400">{org.shortName}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-gray-900 dark:text-white text-sm leading-tight truncate">{org.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{org.shortName}</p>
                       </div>
                     </div>
-                    <div className="flex gap-1.5">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${STATUS_COLORS[org.status] || ''}`}>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <span className={`text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${STATUS_COLORS[org.status] || ''}`}>
                         {org.status === 'active' ? 'Aktiv' : org.status === 'trial' ? 'Trial' : 'Joaktiv'}
                       </span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${PLAN_COLORS[org.plan] || ''}`}>
+                      <span className={`text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ${PLAN_COLORS[org.plan] || ''}`}>
                         {org.plan?.toUpperCase()}
                       </span>
                     </div>
                   </div>
 
                   {org.description && (
-                    <p className="text-xs text-gray-400 mb-3">{org.description}</p>
+                    <p className="text-xs text-gray-400 mb-2 line-clamp-2">{org.description}</p>
                   )}
 
-                  {/* Users avatars */}
-                  <div className="flex items-center gap-2 mb-4">
+                  {/* Users avatars - responsive */}
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="flex -space-x-2">
                       {orgUsers.slice(0, 5).map(u => (
                         <div key={u.id}
-                          className="w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-[9px] font-bold"
+                          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white flex items-center justify-center text-white text-[8px] sm:text-[9px] font-bold"
                           style={{ background: u.color || '#2563eb' }}
                           title={u.name}
                         >
@@ -405,44 +412,46 @@ export default function OrgManager() {
                         </div>
                       ))}
                       {orgUsers.length > 5 && (
-                        <div className="w-6 h-6 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[9px] font-bold text-gray-500">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[8px] sm:text-[9px] font-bold text-gray-500">
                           +{orgUsers.length - 5}
                         </div>
                       )}
                     </div>
-                    <span className="text-xs text-gray-400">{orgUsers.length} përdorues</span>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{orgUsers.length} përdorues</span>
                   </div>
 
                   {/* Stats row */}
-                  <div className="text-xs text-gray-400">
-                    <Clock size={11} className="inline mr-1" />
-                    Krijuar {org.createdAt}
+                  <div className="text-xs text-gray-400 flex items-center gap-1">
+                    <Clock size={10} className="flex-shrink-0" />
+                    <span className="truncate">Krijuar {org.createdAt}</span>
                   </div>
                 </div>
 
-                {/* Actions footer */}
-                <div className="border-t border-gray-50 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+                {/* Actions footer - responsive */}
+                <div className="border-t border-gray-50 dark:border-gray-700 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2">
                   <button
-                    className="flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+                    className="flex items-center gap-1 text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-semibold transition-colors min-w-0"
                     onClick={() => setDetailOrg(org)}
                   >
-                    <Users size={13}/> Shiko përdoruesit
-                    <ChevronRight size={12}/>
+                    <Users size={12} className="flex-shrink-0"/>
+                    <span className="hidden sm:inline">Shiko përdoruesit</span>
+                    <span className="inline sm:hidden">Përdoruesit</span>
+                    <ChevronRight size={11} className="flex-shrink-0 hidden sm:inline"/>
                   </button>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5 sm:gap-1 flex-shrink-0">
                     <button
-                      className="icon-btn text-blue-400 hover:bg-blue-50"
+                      className="icon-btn text-blue-400 hover:bg-blue-50 hover:text-blue-500 p-1.5 sm:p-2"
                       title="Edito"
                       onClick={() => openEdit(org)}
                     >
-                      <Edit3 size={14}/>
+                      <Edit3 size={13}/>
                     </button>
                     <button
-                      className="icon-btn text-red-400 hover:bg-red-50"
+                      className="icon-btn text-red-400 hover:bg-red-50 hover:text-red-500 p-1.5 sm:p-2"
                       title="Fshi"
                       onClick={() => openDelete(org)}
                     >
-                      <Trash2 size={14}/>
+                      <Trash2 size={13}/>
                     </button>
                   </div>
                 </div>

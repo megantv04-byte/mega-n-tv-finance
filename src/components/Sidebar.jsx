@@ -4,6 +4,7 @@ import {
   Truck, Zap, ChevronLeft, UserCog, LogOut, Building2, Crown, Upload,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useFeatures } from '../features/useFeatures'
 
 export default function Sidebar() {
   const {
@@ -11,6 +12,8 @@ export default function Sidebar() {
     invoices, sidebarCollapsed, setSidebarCollapsed, currentUser, logout,
     isSuperAdmin, managerMode, setManagerMode, currentOrg,
   } = useApp()
+
+  const { canAccessSuppliers } = useFeatures()
 
   const today          = new Date().toISOString().slice(0, 10)
   const subNotifyCount = invoices.filter(i => i.notifyDate && i.notifyDate <= today).length
@@ -24,7 +27,8 @@ export default function Sidebar() {
     { id: 'items',         icon: Package,         label: 'Produktet' },
     { id: 'payments',      icon: CreditCard,      label: 'Pagesat' },
     { id: 'expenses',      icon: Receipt,         label: 'Shpenzimet' },
-    { id: 'suppliers',     icon: Truck,           label: 'Furnitorët' },
+    // Suppliers only visible if feature enabled
+    ...(canAccessSuppliers ? [{ id: 'suppliers', icon: Truck, label: 'Furnitorët' }] : []),
     { id: 'reports',       icon: BarChart2,       label: 'Raportet' },
   ]
 
@@ -49,20 +53,20 @@ export default function Sidebar() {
         ${w}
       `}>
         {/* Logo */}
-        <div className={`flex items-center border-b border-gray-100 dark:border-gray-800 h-14 flex-shrink-0 ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'}`}>
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-sm">
-            <Zap size={16} strokeWidth={2.5} />
+        <div className={`flex items-center border-b border-gray-100 dark:border-gray-800 h-12 sm:h-14 flex-shrink-0 ${sidebarCollapsed ? 'justify-center px-2' : 'gap-2 sm:gap-3 px-3 sm:px-4'}`}>
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-sm">
+            <Zap size={14} strokeWidth={2.5} />
           </div>
           {!sidebarCollapsed && (
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-black text-gray-900 dark:text-gray-100 leading-none tracking-tight">X-Flow</div>
-              <div className="text-[10px] text-gray-400 dark:text-gray-500 tracking-widest uppercase mt-0.5">
+              <div className="text-xs sm:text-sm font-black text-gray-900 dark:text-gray-100 leading-none tracking-tight">X-Flow</div>
+              <div className="text-[8px] sm:text-[10px] text-gray-400 dark:text-gray-500 tracking-widest uppercase mt-0.5 truncate">
                 {managerMode ? 'Manager' : (currentOrg?.shortName || 'Pro')}
               </div>
             </div>
           )}
           {!sidebarCollapsed && (
-            <button className="ml-auto icon-btn lg:hidden" onClick={() => setSidebarOpen(false)}>
+            <button className="ml-auto icon-btn lg:hidden p-1" onClick={() => setSidebarOpen(false)}>
               <X size={16} />
             </button>
           )}
@@ -190,14 +194,18 @@ export default function Sidebar() {
         )}
 
         {/* Logout button */}
-        <div className={`px-2 py-2 border-t border-gray-100 dark:border-gray-800 ${sidebarCollapsed ? '' : ''}`}>
+        <div className={`px-2 py-3 border-t border-gray-100 dark:border-gray-800 mt-auto`}>
           <button
-            className={`sidebar-item w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
-            onClick={logout}
+            type="button"
+            className={`sidebar-item w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 cursor-pointer transition-all ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+            onClick={() => {
+              console.log('Logging out...')
+              logout()
+            }}
             title="Dilni nga sistemi"
           >
             <LogOut size={18} className="flex-shrink-0" />
-            {!sidebarCollapsed && <span>Dilni</span>}
+            {!sidebarCollapsed && <span className="font-medium">Dilni</span>}
           </button>
         </div>
 

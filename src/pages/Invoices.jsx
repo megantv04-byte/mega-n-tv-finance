@@ -11,7 +11,7 @@ import InvoiceModal from './InvoiceModal'
 import PaymentModal from './PaymentModal'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 
-const STATUS_ORDER = { overdue: 0, pending: 1, draft: 2, paid: 3, void: 4 }
+const STATUS_ORDER = { overdue: 0, pending: 1, partial: 1.5, draft: 2, paid: 3, void: 4 }
 
 /* ── helpers ─────────────────────────────────────────── */
 const cleanPhone = p => (p || '').replace(/[\s+\-()]/g, '')
@@ -36,6 +36,15 @@ function InvoiceListCard({ inv, selected, onClick }) {
 
   let dueLabel, dueCls
   if      (inv.status === 'paid')  { dueLabel = 'PAGUAR';         dueCls = 'text-emerald-600' }
+  else if (inv.status === 'partial') {
+    // Shfaq shumin e paguar dhe të mbetur për faturat e paguara pjesërisht
+    const paid = inv.paidAmount || 0
+    const remaining = inv.amount - paid
+    const paidFormatted = Math.round(paid * 100) / 100
+    const remainingFormatted = Math.round(remaining * 100) / 100
+    dueLabel = `€${paidFormatted} / €${remainingFormatted}`
+    dueCls = 'text-blue-600 font-semibold'
+  }
   else if (inv.status === 'void')  { dueLabel = 'VOID';           dueCls = 'text-gray-400 line-through' }
   else if (inv.status === 'draft') { dueLabel = 'DRAFT';          dueCls = 'text-gray-400' }
   else if (diff === null)          { dueLabel = '—';              dueCls = 'text-gray-400' }
@@ -96,8 +105,8 @@ function InvoiceSidePanel({ invId, onClose }) {
   const isOverdue = inv.status === 'overdue' ||
     (inv.due && inv.due < today && inv.status !== 'paid' && inv.status !== 'void')
 
-  const canContact = (inv.status === 'pending' || inv.status === 'overdue' || isOverdue) && rawPhone
-  const canPay     = inv.status === 'pending' || inv.status === 'overdue' || inv.status === 'draft'
+  const canContact = (inv.status === 'pending' || inv.status === 'partial' || inv.status === 'overdue' || isOverdue) && rawPhone
+  const canPay     = inv.status === 'pending' || inv.status === 'partial' || inv.status === 'overdue' || inv.status === 'draft'
   const canVoid    = inv.status !== 'paid' && inv.status !== 'void'
   const msgEncoded = encodeURIComponent(buildReminderMsg(inv))
   const linkedPayment = payments.find(p => p.invoiceId === inv.id)
@@ -113,10 +122,25 @@ function InvoiceSidePanel({ invId, onClose }) {
     onClose()
   }
   const doDeletePayment = () => {
+    // Kalkuloj pagesën e mbetur pas fshirjes
+    const allPaymentsForInvoice = payments.filter(p => p.invoiceId === inv.id)
+    const remainingAmount = allPaymentsForInvoice
+      .filter(p => p.id !== linkedPayment.id)
+      .reduce((sum, p) => sum + Number(p.amount), 0)
+
     setPayments(prev => prev.filter(p => p.id !== linkedPayment.id))
-    setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status: 'pending' } : i))
+    setInvoices(prev => prev.map(i => {
+      if (i.id !== inv.id) return i
+
+      // Vendos statusin bazuar në shumin e mbetur
+      let status = 'pending'
+      if (remainingAmount >= i.amount) status = 'paid'
+      else if (remainingAmount > 0) status = 'partial'
+
+      return { ...i, paidAmount: remainingAmount, status }
+    }))
     setConfirmDelPayment(false)
-    showToast('Pagesa u fshi. Fatura kaloi në pritje.')
+    showToast('Pagesa u fshi. Fatura u përditësua.')
   }
   const addComment = () => {
     const txt = comment.trim()
@@ -272,6 +296,28 @@ function InvoiceSidePanel({ invId, onClose }) {
             <div className="text-left sm:text-right sm:min-w-[190px]">
               <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Totali për pagesë</p>
               <p className="text-[1.7rem] font-bold text-gray-800 leading-tight mb-3">{fmt(inv.amount)}</p>
+
+              {/* Shfaq shumin e paguar dhe balancën për faturat e paguara pjesërisht */}
+              {inv.status === 'partial' && inv.paidAmount > 0 && (
+                <div className="mb-3 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="flex items-center justify-between sm:justify-end gap-4 text-xs mb-1.5">
+                    <span className="text-blue-600 font-semibold">Paguar:</span>
+                    <span className="font-bold text-blue-700 w-24 text-right">{fmt(inv.paidAmount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-4 text-xs">
+                    <span className="text-amber-600 font-semibold">Mbetur:</span>
+                    <span className="font-bold text-amber-700 w-24 text-right">{fmt(inv.amount - inv.paidAmount)}</span>
+                  </div>
+                  {/* Indikatori i progresit */}
+                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all"
+                      style={{ width: `${(inv.paidAmount / inv.amount) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-1 text-xs">
                 <div className="flex items-center justify-between sm:justify-end gap-4">
                   <span className="text-gray-400">Data e faturës:</span>
@@ -605,6 +651,7 @@ function KanbanBoard({ invoices, setPreview }) {
 /* Main Invoices page                                         */
 /* ══════════════════════════════════════════════════════════ */
 export default function Invoices() {
+  console.log('🆕 PARTIAL PAYMENTS SYSTEM LOADED - Invoices.jsx updated')
   const {
     invoices, setInvoices,
     customers,

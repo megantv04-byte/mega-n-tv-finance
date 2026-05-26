@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { CreditCard, ChevronLeft, ChevronRight, AlertCircle, Pencil } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { useFeatures } from '../features/useFeatures'
 import { Modal, FormGroup } from '../components/UI'
 import { depositedToOptions } from '../data/mockData'
 
@@ -89,6 +90,8 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
     showToast, fmt,
   } = useApp()
 
+  const { canUseDepositAccounts } = useFeatures()
+
   const isEdit = !!editPayment
   const today  = new Date().toISOString().slice(0, 10)
 
@@ -126,14 +129,19 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
   const [err, setErr] = useState('')
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
-  const unpaidInvoices = invoices.filter(i => i.status !== 'paid' && i.status !== 'draft')
+  const unpaidInvoices = invoices.filter(i => {
+    // Shfaq faturat e paguara totalisht ose në pritje/pjesërisht
+    return i.status !== 'paid' && i.status !== 'draft'
+  })
 
   const save = () => {
     if (!selectedInv)
       { setErr('Zgjidh faturën.'); return }
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
       { setErr('Shuma duhet të jetë numër pozitiv.'); return }
-    if (!form.depositedTo)
+
+    // Deposit fields are required only if feature is enabled
+    if (canUseDepositAccounts && !form.depositedTo)
       { setErr('Zgjidh te kush depozitohet.'); return }
 
     const fee = form.fee === '' ? 0 : Number(form.fee)
@@ -181,10 +189,28 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
     /* 1 — regjistro pagesën */
     setPayments(prev => [payment, ...prev])
 
-    /* 2 — shëno faturën si e paguar */
-    setInvoices(prev => prev.map(i =>
-      i.id === selectedInv.id ? { ...i, status: 'paid' } : i
-    ))
+    /* 2 — kalkuloj shumin totale të paguar për këtë faturë */
+    // Përfshirë pagesën e re që sapo u regjistrua
+    setInvoices(prev => prev.map(i => {
+      if (i.id !== selectedInv.id) return i
+
+      // Kalkuloj shumin e paguar = pagesa e re + shuma tashmë e paguar
+      const newPaidAmount = (i.paidAmount || 0) + Number(form.amount)
+      const invoiceTotal = i.amount
+
+      // Përcaktoj statusin:
+      // - Nëse pagesa >= shuma totale: 'paid' (e paguar)
+      // - Nëse pagesa > 0 e < shuma totale: 'partial' (pjesërisht e paguar)
+      // - Nëse pagesa = 0: 'pending' (në pritje)
+      let status = 'pending'
+      if (newPaidAmount >= invoiceTotal) {
+        status = 'paid'
+      } else if (newPaidAmount > 0) {
+        status = 'partial'
+      }
+
+      return { ...i, paidAmount: newPaidAmount, status }
+    }))
 
     /* 3 — krijo shpenzim automatikisht nëse ka fee */
     if (fee > 0) {
@@ -313,17 +339,19 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
         />
       </FormGroup>
 
-      {/* Depozituar te — slide select */}
-      <FormGroup label="Depozituar te">
-        <SlideSelect
-          value={form.depositAccount}
-          onChange={v => set('depositAccount', v)}
-          options={depositAccounts}
-        />
-        {form.depositAccount && (
-          <p className="text-xs text-blue-500 mt-1.5 font-medium">✓ {form.depositAccount}</p>
-        )}
-      </FormGroup>
+      {/* Depozituar te — slide select - Only for organizations with feature enabled */}
+      {canUseDepositAccounts && (
+        <FormGroup label="Depozituar te">
+          <SlideSelect
+            value={form.depositAccount}
+            onChange={v => set('depositAccount', v)}
+            options={depositAccounts}
+          />
+          {form.depositAccount && (
+            <p className="text-xs text-blue-500 mt-1.5 font-medium">✓ {form.depositAccount}</p>
+          )}
+        </FormGroup>
+      )}
 
       {/* Fee + Referenca */}
       <div className="grid grid-cols-2 gap-4">
@@ -376,21 +404,23 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose })
         </div>
       )}
 
-      {/* Depozituar tek — dropdown */}
-      <FormGroup label="Depozituar tek *">
-        <select
-          className="form-control"
-          value={form.depositedTo}
-          onChange={e => set('depositedTo', e.target.value)}
-        >
-          <option value="">— Zgjidh ku depozitohet —</option>
-          {depositedToOptions.map(opt => (
-            <option key={opt} value={opt}>
-              👤 {opt}
-            </option>
-          ))}
-        </select>
-      </FormGroup>
+      {/* Depozituar tek — dropdown - Only for organizations with feature enabled */}
+      {canUseDepositAccounts && (
+        <FormGroup label="Depozituar tek *">
+          <select
+            className="form-control"
+            value={form.depositedTo}
+            onChange={e => set('depositedTo', e.target.value)}
+          >
+            <option value="">— Zgjidh ku depozitohet —</option>
+            {depositedToOptions.map(opt => (
+              <option key={opt} value={opt}>
+                👤 {opt}
+              </option>
+            ))}
+          </select>
+        </FormGroup>
+      )}
 
       {/* Shënime */}
       <FormGroup label="Shënime (opsionale)">

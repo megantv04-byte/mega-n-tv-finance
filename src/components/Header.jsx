@@ -32,31 +32,31 @@ export default function Header() {
     : 'AK'
 
   return (
-    <header className="h-14 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center px-5 gap-4 sticky top-0 z-30 transition-colors">
+    <header className="h-12 sm:h-14 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 flex items-center px-3 sm:px-5 gap-2 sm:gap-4 sticky top-0 z-30 transition-colors">
       {/* Mobile menu */}
-      <button className="icon-btn lg:hidden flex-shrink-0" onClick={() => setSidebarOpen(true)}>
-        <Menu size={20} />
+      <button className="icon-btn lg:hidden flex-shrink-0 p-1.5 sm:p-2" onClick={() => setSidebarOpen(true)}>
+        <Menu size={18} />
       </button>
 
-      <h1 className="text-base font-bold text-gray-800 dark:text-gray-100 flex-1">
+      <h1 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 flex-1 truncate">
         {PAGE_TITLES[page] || 'X-Flow'}
       </h1>
 
-      {/* Search */}
-      <div className="hidden md:flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 w-52 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+      {/* Search - hidden on mobile */}
+      <div className="hidden lg:flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 w-48 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all flex-shrink-0">
         <Search size={14} className="text-gray-400 flex-shrink-0" />
         <input className="bg-transparent border-none outline-none text-sm text-gray-600 dark:text-gray-300 w-full placeholder-gray-400" placeholder="Kërko..." />
       </div>
 
       {/* Currency selector */}
-      <div className="relative hidden sm:block">
+      <div className="relative hidden xs:block flex-shrink-0">
         <button
-          className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-1 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           onClick={() => setCurOpen(v => !v)}
         >
           <span>{currency.symbol}</span>
-          <span>{currency.code}</span>
-          <ChevronDown size={12} className="text-gray-400" />
+          <span className="hidden sm:inline">{currency.code}</span>
+          <ChevronDown size={11} className="text-gray-400" />
         </button>
         {curOpen && (
           <div className="absolute top-full right-0 mt-1.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg py-1 w-44 z-50">

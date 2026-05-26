@@ -3,6 +3,7 @@ import { X, CheckCircle, AlertCircle, TrendingUp, TrendingDown } from 'lucide-re
 export function StatusBadge({ status }) {
   const map = {
     paid:    { cls: 'badge-paid',    label: 'Paguar' },
+    partial: { cls: 'badge-pending', label: 'Pjesërisht e paguar' },
     pending: { cls: 'badge-pending', label: 'Në pritje' },
     overdue: { cls: 'badge-overdue', label: 'Vonuar' },
     draft:   { cls: 'badge-draft',   label: 'Draft' },

@@ -1,4 +1,6 @@
 import { AppProvider, useApp } from './context/AppContext'
+import { TenantProvider, useTenant } from './context/TenantContext'
+import RoleBasedRouter from './components/RoleBasedRouter'
 import Login from './pages/Login'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
@@ -13,7 +15,6 @@ import Settings from './pages/Settings'
 import Subscriptions from './pages/Subscriptions'
 import Suppliers from './pages/Suppliers'
 import UsersPage from './pages/Users'
-import OrgManager from './pages/OrgManager'
 import ImportData from './pages/ImportData'
 import { Toast, LoadingSkeleton } from './components/UI'
 
@@ -32,13 +33,9 @@ const ORG_PAGES = {
   import:        ImportData,
 }
 
-function AppLayout() {
-  const { page, loading, toast, setToast, modal, darkMode, isSuperAdmin, managerMode } = useApp()
-
-  // Super admin në manager mode sheh OrgManager, pa sidebar-in normal
-  const PageComponent = (isSuperAdmin && managerMode)
-    ? OrgManager
-    : (ORG_PAGES[page] || Dashboard)
+function OrgAppLayout() {
+  const { page, loading, toast, setToast, modal, darkMode } = useApp()
+  const PageComponent = ORG_PAGES[page] || Dashboard
 
   return (
     <div className={`app flex min-h-screen ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -63,17 +60,37 @@ function AppLayout() {
 
 function AuthWrapper() {
   const { users, setCurrentUser, currentUser } = useApp()
+  const { createSession, loading: tenantLoading } = useTenant()
+
+  if (tenantLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-900">
+      <div className="text-center text-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p>Duke u ngarku...</p>
+      </div>
+    </div>
+  }
 
   if (!currentUser) {
-    return <Login users={users} onLogin={setCurrentUser} />
+    const handleLogin = (user) => {
+      // Set user in AppContext
+      setCurrentUser(user)
+      // Create session in TenantContext
+      createSession(user, user.orgId)
+    }
+    return <Login users={users} onLogin={handleLogin} />
   }
-  return <AppLayout />
+
+  // Route based on user role (super admin or regular user)
+  return <RoleBasedRouter AppLayout={OrgAppLayout} />
 }
 
 export default function App() {
   return (
-    <AppProvider>
-      <AuthWrapper />
-    </AppProvider>
+    <TenantProvider>
+      <AppProvider>
+        <AuthWrapper />
+      </AppProvider>
+    </TenantProvider>
   )
 }
