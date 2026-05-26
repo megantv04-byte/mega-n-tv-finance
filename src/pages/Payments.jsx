@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import {
   CreditCard, Download, Search, X, Filter,
-  TrendingUp, Wallet, Users, Receipt, Pencil, Trash2, FileSpreadsheet,
+  Pencil, Trash2, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { EmptyState, Pagination } from '../components/UI'
@@ -194,8 +194,6 @@ export default function Payments() {
     setDeletingId(null)
   }
 
-  const unpaidCount = invoices.filter(i => i.status === 'pending' || i.status === 'overdue').length
-
   return (
     <div>
       {/* Header */}
@@ -230,36 +228,6 @@ export default function Payments() {
           onClose={() => setImportOpen(false)}
         />
       )}
-
-      {/* Alert fatura pa pagese */}
-      {unpaidCount > 0 && (
-        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-5 text-sm">
-          <Receipt size={16} className="text-amber-500 flex-shrink-0" />
-          <span className="text-amber-700">
-            Ke <strong>{unpaidCount}</strong> fatura të papaguara. Shko te <strong>Faturat</strong> për t'i mbyllur.
-          </span>
-        </div>
-      )}
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp size={14} className="text-emerald-500" />
-            <p className="text-xs text-gray-400 font-medium">Neto Totale</p>
-          </div>
-          <p className="text-xl font-bold text-emerald-600">{fmt(totalNet)}</p>
-          <p className="text-xs text-gray-400 mt-0.5">Bruto: {fmt(totalGross)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Wallet size={14} className="text-amber-500" />
-            <p className="text-xs text-gray-400 font-medium">Fee Totale</p>
-          </div>
-          <p className="text-xl font-bold text-amber-500">- {fmt(totalFee)}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{filtered.length} transaksione</p>
-        </div>
-      </div>
 
       {/* Filtrat */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
