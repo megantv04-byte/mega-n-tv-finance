@@ -1161,7 +1161,7 @@ export default function Invoices() {
                                         setOpenDropdown(null)
                                       }}
                                     >
-                                      <MessageCircle size={14}/> WhatsApp {isOverdue && '🔔'}
+                                      <MessageCircle size={14}/> Pagesa WA {isOverdue && '🔔'}
                                     </a>
                                   )}
 
@@ -1175,7 +1175,7 @@ export default function Invoices() {
                                         setOpenDropdown(null)
                                       }}
                                     >
-                                      <Send size={14}/> Telegram
+                                      <Send size={14}/> Pagesa TG
                                     </a>
                                   )}
 
