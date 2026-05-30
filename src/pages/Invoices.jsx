@@ -1011,7 +1011,7 @@ export default function Invoices() {
                 <thead className="sticky top-0 z-10">
                   <tr className="border-b-2 border-gray-100 bg-white">
                     {[
-                      { key: 'id',       label: 'ID',     cls: '' },
+                      { key: 'id',       label: 'ID',     cls: 'hidden sm:table-cell' },
                       { key: 'customer', label: 'Klienti',cls: '' },
                       { key: 'referent', label: 'Referenti', cls: 'hidden sm:table-cell' },
                     ].map(col => (
@@ -1025,7 +1025,7 @@ export default function Invoices() {
                     ))}
                     <th className="table-th hidden md:table-cell">Data</th>
                     <th className="table-th hidden lg:table-cell">Afati</th>
-                    <th className="table-th hidden lg:table-cell">Skadimi Abonimit</th>
+                    <th className="table-th sm:table-cell lg:table-cell">Skadimi Abonimit</th>
                     <th className="table-th cursor-pointer select-none hover:text-blue-600"
                         onClick={() => toggleSort('amount')}>
                       <span className="flex items-center gap-1">
@@ -1058,7 +1058,7 @@ export default function Invoices() {
                         className="hover:bg-blue-50/30 transition-colors group cursor-pointer"
                         onClick={() => setPreview(inv.id)}
                       >
-                        <td className="table-td font-bold text-blue-600 text-sm">{inv.id}</td>
+                        <td className="table-td font-bold text-blue-600 text-sm hidden sm:table-cell">{inv.id}</td>
                         <td className="table-td font-medium text-gray-800">
                           <div className="flex items-center gap-1.5">
                             {inv.customer}
@@ -1083,13 +1083,13 @@ export default function Invoices() {
                         <td className={`table-td hidden lg:table-cell ${isOverdue ? 'text-red-500 font-semibold' : 'text-gray-400'}`}>
                           {inv.due}
                         </td>
-                        <td className="table-td text-blue-600 hidden lg:table-cell text-sm font-medium">
+                        <td className="table-td text-blue-600 sm:table-cell lg:table-cell text-sm font-medium">
                           {inv.subscriptionExpiry ? (
-                            <span className="px-2 py-1 bg-blue-50 rounded-full">
+                            <span className="px-2 py-1 bg-blue-50 rounded-full text-xs">
                               {inv.subscriptionExpiry}
                             </span>
                           ) : (
-                            <span className="text-gray-300 italic">-</span>
+                            <span className="text-gray-300 italic text-xs">-</span>
                           )}
                         </td>
                         <td className="table-td font-bold text-gray-800">{fmt(inv.amount)}</td>
