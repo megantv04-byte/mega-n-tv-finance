@@ -111,21 +111,45 @@ function ReferredBySelect({ value, onChange, excludeId }) {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="px-3 py-3 text-xs text-gray-400 text-center">Nuk u gjet asnjë klient</div>
-          ) : (
-            filtered.map((name, i) => (
+            query.trim() ? (
+              // Show option to use the typed text as referrer
               <div
-                key={name}
-                className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors ${
-                  i === active ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50 text-gray-700'
-                }`}
-                onMouseDown={() => select(name)}
-                onMouseEnter={() => setActive(i)}
+                className="px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors hover:bg-blue-50 text-blue-600 hover:text-blue-700 font-medium"
+                onMouseDown={() => select(query.trim())}
+                onMouseEnter={() => setActive(0)}
               >
-                <UserCheck size={12} className="text-gray-300 flex-shrink-0"/>
-                {name}
+                <UserCheck size={12} className="flex-shrink-0"/>
+                ✓ Shto "{query.trim()}" si referues të ri
               </div>
-            ))
+            ) : (
+              <div className="px-3 py-3 text-xs text-gray-400 text-center">Nuk u gjet asnjë klient</div>
+            )
+          ) : (
+            <>
+              {filtered.map((name, i) => (
+                <div
+                  key={name}
+                  className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors ${
+                    i === active ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50 text-gray-700'
+                  }`}
+                  onMouseDown={() => select(name)}
+                  onMouseEnter={() => setActive(i)}
+                >
+                  <UserCheck size={12} className="text-gray-300 flex-shrink-0"/>
+                  {name}
+                </div>
+              ))}
+              {query.trim() && !filtered.includes(query.trim()) && (
+                <div
+                  className="px-3 py-2 text-sm cursor-pointer flex items-center gap-2 transition-colors hover:bg-blue-50 text-blue-600 hover:text-blue-700 font-medium border-t border-gray-100"
+                  onMouseDown={() => select(query.trim())}
+                  onMouseEnter={() => setActive(filtered.length)}
+                >
+                  <UserCheck size={12} className="flex-shrink-0"/>
+                  ✓ Shto "{query.trim()}" si referues të ri
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
