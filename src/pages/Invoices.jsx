@@ -166,7 +166,7 @@ function InvoiceSidePanel({ invId, onClose }) {
         </button>
         <div className="flex items-center gap-2 mr-1">
           <span className="font-bold text-gray-800 text-sm">{inv.id}</span>
-          <StatusBadge status={inv.status}/>
+          <StatusBadge status={isOverdue && inv.status !== 'paid' && inv.status !== 'void' ? 'overdue' : inv.status}/>
         </div>
 
         <button
@@ -343,7 +343,7 @@ function InvoiceSidePanel({ invId, onClose }) {
                 )}
               </div>
               <div className="mt-2 flex justify-start sm:justify-end">
-                <StatusBadge status={inv.status}/>
+                <StatusBadge status={isOverdue && inv.status !== 'paid' && inv.status !== 'void' ? 'overdue' : inv.status}/>
               </div>
             </div>
           </div>
@@ -1093,7 +1093,7 @@ export default function Invoices() {
                           )}
                         </td>
                         <td className="table-td font-bold text-gray-800">{fmt(inv.amount)}</td>
-                        <td className="table-td"><StatusBadge status={inv.status}/></td>
+                        <td className="table-td"><StatusBadge status={isOverdue && inv.status !== 'paid' && inv.status !== 'void' ? 'overdue' : inv.status}/></td>
                         <td className="table-td relative" onClick={e => e.stopPropagation()}>
                           <div className="flex items-center justify-end">
                             <div className="relative">
