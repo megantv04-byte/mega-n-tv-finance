@@ -129,10 +129,41 @@ export function createAutoBackup(appState) {
     // Save to localStorage
     localStorage.setItem(AUTOBACKUP_KEY, JSON.stringify(backups))
 
+    // Also download to disk automatically
+    downloadAutoBackupToDisk(backup)
+
     return { success: true, message: 'Auto-backup u kriju me sukses' }
   } catch (error) {
     console.error('Auto-backup creation error:', error)
     return { success: false, message: 'Gabim në krijimin e auto-backup-it' }
+  }
+}
+
+export function downloadAutoBackupToDisk(backup) {
+  try {
+    const jsonString = JSON.stringify(backup, null, 2)
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+
+    // Create timestamp for filename
+    const now = new Date()
+    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5) // Format: YYYY-MM-DDTHH-mm-ss
+    const filename = `xflow-autobackup-${timestamp}.json`
+
+    // Create and trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    console.log(`✅ Auto-backup downloaded: ${filename}`)
+    return { success: true, filename }
+  } catch (error) {
+    console.error('Auto-backup download error:', error)
+    return { success: false, error }
   }
 }
 
@@ -211,6 +242,7 @@ export default {
   importBackup,
   parseBackupFile,
   createAutoBackup,
+  downloadAutoBackupToDisk,
   getAutoBackups,
   getLatestAutoBackup,
   restoreFromAutoBackup,
