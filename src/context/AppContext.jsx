@@ -477,6 +477,30 @@ export function AppProvider({ children }) {
     localStorage.setItem('xflow_representatives', JSON.stringify(representatives))
   }, [representatives])
 
+  /* ── Browser history management for page navigation ── */
+  useEffect(() => {
+    // Sync page state with browser URL for back button support
+    const url = new URL(window.location)
+    if (page !== 'dashboard') {
+      url.searchParams.set('page', page)
+    } else {
+      url.searchParams.delete('page')
+    }
+    window.history.pushState({ page }, '', url.toString())
+  }, [page])
+
+  useEffect(() => {
+    // Handle back button presses
+    const handlePopState = (e) => {
+      const newPage = e.state?.page || new URL(window.location).searchParams.get('page') || 'dashboard'
+      setPage(newPage)
+      localStorage.setItem('xflow_page', newPage)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   /* ── Logout ── */
   const logout = useCallback(() => {
     setCurrentUser(null)
