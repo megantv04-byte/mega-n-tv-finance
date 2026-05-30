@@ -3,7 +3,7 @@ import {
   FileText, Download, Pencil, Trash2, CreditCard,
   MessageCircle, Send, XCircle, X, MessageSquare,
   Search, Plus, LayoutList, Columns, AlertTriangle, FileSpreadsheet,
-  MoreVertical, Edit3, Eye,
+  MoreVertical, Edit3,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { StatusBadge, EmptyState, Pagination } from '../components/UI'
@@ -1149,17 +1149,6 @@ export default function Invoices() {
                                     }}
                                   >
                                     <Pencil size={14}/> Ndrysho
-                                  </button>
-
-                                  <button
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
-                                    onClick={e => {
-                                      e.stopPropagation()
-                                      setPreview(inv.id)
-                                      setOpenDropdown(null)
-                                    }}
-                                  >
-                                    <Eye size={14}/> Shiko detajet
                                   </button>
 
                                   {canContact && (
