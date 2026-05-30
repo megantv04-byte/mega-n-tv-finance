@@ -3,6 +3,8 @@
  * Handles automatic WhatsApp notifications for subscription expiration
  */
 
+import MessageLogService from './MessageLogService'
+
 // Message template for subscription expiry notifications
 function buildSubscriptionExpiryMessage(customer, subscriptionExpiry, daysLeft) {
   const firstName = customer.split(' ')[0]
@@ -86,6 +88,14 @@ export function sendSubscriptionExpiryNotification(invoice, customers) {
 
   // Send WhatsApp message
   openWhatsAppMessage(phoneNumber, message)
+
+  // Log the message
+  MessageLogService.logWhatsAppMessage(
+    invoice.customer,
+    phoneNumber,
+    message,
+    invoice.id
+  )
 
   // Mark as sent today
   const today = new Date().toISOString().slice(0, 10)

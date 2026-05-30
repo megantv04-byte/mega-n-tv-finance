@@ -11,6 +11,7 @@ import InvoiceModal from './InvoiceModal'
 import PaymentModal from './PaymentModal'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 import CustomerDetailsModal from './CustomerDetailsModal'
+import MessageLogService from '../services/MessageLogService'
 
 const STATUS_ORDER = { overdue: 0, pending: 1, partial: 1.5, draft: 2, paid: 3, void: 4 }
 
@@ -25,6 +26,10 @@ function buildReminderMsg(inv) {
   if (late)
     return `Pershendetje ${firstName}!\nFatura juaj me vlere €${inv.amount} ka kaluar afatin e pageses (${inv.due}).\nJu lutem kryeni pagesen urgjentisht per te shmangur nderprerjene sherbimit tuaj.\nFaleminderit!\nMe respekt, PREDATOR - MEGA SH TV`
   return `Pershendetje ${firstName}!\nFatura juaj me vlere €${inv.amount} eshte ne pritje te pageses deri me date ${inv.due}.\nJu lutem kryeni pagesen ne kohe.\nFaleminderit!\nMe respekt, PREDATOR - MEGA SH TV`
+}
+
+function buildInvoiceMsg(inv) {
+  return `Fatura per: ${inv.customer}\nData e abonimit: ${inv.date || '—'}\nData e skadimit te abonimit: ${inv.subscriptionExpiry || '—'}\nAfati i pageses: ${inv.due || '—'}`
 }
 
 /* ── compact invoice card (left panel list) ─────────── */
@@ -1182,6 +1187,21 @@ export default function Invoices() {
                                       }}
                                     >
                                       <Send size={14}/> Telegram
+                                    </a>
+                                  )}
+
+                                  {canContact && (
+                                    <a
+                                      href={`https://wa.me/${rawPhone}?text=${encodeURIComponent(buildInvoiceMsg(inv))}`}
+                                      target="_blank" rel="noopener noreferrer"
+                                      className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        MessageLogService.logWhatsAppMessage(inv.customer, rawPhone, buildInvoiceMsg(inv), inv.id)
+                                        setOpenDropdown(null)
+                                      }}
+                                    >
+                                      <FileText size={14}/> Dërgo faturën
                                     </a>
                                   )}
 
