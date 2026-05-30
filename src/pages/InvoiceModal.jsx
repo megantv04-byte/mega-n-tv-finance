@@ -371,9 +371,32 @@ function extractMonths(name) {
   const m = name.match(/(\d+)\s*muaj/i)
   return m ? parseInt(m[1]) : null
 }
-function monthsToDays(m) {
-  // 12 muaj → 365 ditë, të tjerët → muaj × 30
-  return m === 12 ? 365 : m * 30
+function calculateSubscriptionExpiry(baseDate, months) {
+  // Llogarit datën e skadimit duke shtuar muaj kalendarë
+  const date = new Date(baseDate)
+  const year = date.getFullYear()
+  const month = date.getMonth()
+  const day = date.getDate()
+
+  // Shto muajt
+  let newMonth = month + months
+  let newYear = year
+
+  // Rregulloji vitin nëse muajt kalojnë 11
+  while (newMonth > 11) {
+    newMonth -= 12
+    newYear += 1
+  }
+
+  // Krijo datën e re
+  const expiryDate = new Date(newYear, newMonth, day)
+
+  // Nëse dita nuk ekziston në muajin e ri, përdor ditën e fundit të muajit
+  if (expiryDate.getMonth() !== newMonth) {
+    expiryDate.setDate(0) // Kthehu në ditën e fundit të muajit të mëparshëm
+  }
+
+  return expiryDate
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -432,8 +455,7 @@ export default function InvoiceModal({ initialData }) {
       const months = extractMonths(patch.desc)
       if (months !== null) {
         const base = new Date(initialData?.date || new Date())
-        const exp  = new Date(base)
-        exp.setDate(exp.getDate() + monthsToDays(months))
+        const exp  = calculateSubscriptionExpiry(base, months)
         const expStr    = exp.toISOString().slice(0, 10)
         const notifyD   = new Date(exp)
         notifyD.setDate(notifyD.getDate() - 7)
