@@ -307,13 +307,14 @@ export function AppProvider({ children }) {
       const loadedVendors   = load(vend, mockVendors)
       const loadedItems     = load(itm,  mockItems)
 
-      setInvoices(loadedInvoices);        prevInvoices.current  = loadedInvoices
-      setCustomers(loadedCustomers);      prevCustomers.current = loadedCustomers
-      setExpenses(loadedExpenses);        prevExpenses.current  = loadedExpenses
-      setPayments(loadedPayments);        prevPayments.current  = loadedPayments
-      setTransfers(loadedTransfers);      prevTransfers.current = loadedTransfers
-      setVendors(loadedVendors);          prevVendors.current   = loadedVendors
-      setItems(loadedItems);              prevItems.current     = loadedItems
+      // Use wrapped setters to ensure orgId is assigned to all items from Supabase
+      wrappedSetInvoices(loadedInvoices);    prevInvoices.current  = loadedInvoices
+      wrappedSetCustomers(loadedCustomers);  prevCustomers.current = loadedCustomers
+      wrappedSetExpenses(loadedExpenses);    prevExpenses.current  = loadedExpenses
+      wrappedSetPayments(loadedPayments);    prevPayments.current  = loadedPayments
+      wrappedSetTransfers(loadedTransfers);  prevTransfers.current = loadedTransfers
+      setVendors(loadedVendors);             prevVendors.current   = loadedVendors
+      setItems(loadedItems);                 prevItems.current     = loadedItems
 
       // Settings
       if (sett.data?.length) {
