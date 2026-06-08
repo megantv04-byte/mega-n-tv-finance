@@ -102,20 +102,8 @@ export function AppProvider({ children }) {
     if (isSuperAdmin) return data  // Superadmin sheh të gjithçka
     if (!currentOrgId) return data  // Nëse nuk ka user, shfaq të gjitha (mockData)
 
-    // STRICT FILTERING: Only show items that belong to THIS org
-    // No cross-org leakage!
-    const filtered = data.filter(item => {
-      // If no orgId, assign current org (shouldn't happen but safety net)
-      if (!item.orgId) {
-        console.warn(`[XFlow] ⚠️ Item without orgId found:`, item.id, '- this should not happen!')
-        return false  // Don't show items without orgId
-      }
-      return item.orgId === currentOrgId
-    })
-
-    if (data.length > filtered.length) {
-      console.warn(`[XFlow] FILTERING: ${data.length} → ${filtered.length} (removed ${data.length - filtered.length} items from other orgs)`)
-    }
+    // Filter by orgId - show items that match OR have no orgId (backward compat)
+    const filtered = data.filter(item => !item.orgId || item.orgId === currentOrgId)
     return filtered
   }
 
@@ -125,15 +113,15 @@ export function AppProvider({ children }) {
       const next = typeof fn === 'function' ? fn(prev) : fn
       if (!Array.isArray(next)) return next
 
-      // CRITICAL: Ensure ALL invoices have orgId to prevent cross-org leakage
+      // Assign orgId if missing (fallback safety)
+      const orgIdToUse = currentOrgId || 'default'
       if (!currentOrgId) {
-        console.error('🔴 SECURITY: Trying to set invoices without currentOrgId! This will break multi-tenant isolation!')
-        return prev
+        console.warn('⚠️ No currentOrgId set, using fallback!')
       }
 
       return next.map(item => ({
         ...item,
-        orgId: currentOrgId  // FORCE orgId - never allow undefined!
+        orgId: item.orgId || orgIdToUse  // Use existing or assign current
       }))
     })
   }, [currentOrgId])
