@@ -1140,8 +1140,8 @@ export default function Invoices() {
           />
         ) : (
           <>
-            <div className="overflow-auto" style={{ maxHeight: 'calc(100vh - 270px)' }}>
-              <table className="w-full min-w-[500px]">
+            <div className="overflow-y-auto overflow-x-visible" style={{ maxHeight: 'calc(100vh - 270px)' }}>
+              <table className="w-full min-w-[500px]" style={{ position: 'relative' }}>
                 <thead className="sticky top-0 z-10">
                   <tr className="border-b-2 border-gray-100 bg-white">
                     <th className="table-th w-8 text-center">
@@ -1260,7 +1260,7 @@ export default function Invoices() {
 
                               {/* Dropdown Menu */}
                               {isDropdownOpen && (
-                                <div className="absolute right-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-2xl z-[9999] pointer-events-auto">
                                   <button
                                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
                                     onClick={e => {
