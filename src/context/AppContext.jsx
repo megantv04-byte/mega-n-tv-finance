@@ -629,6 +629,7 @@ export function AppProvider({ children }) {
   const contextExpenses  = isTester ? tExpenses   : filterByOrg(expenses)
   const contextPayments  = isTester ? tPayments   : filterByOrg(payments)
   const contextTransfers = isTester ? tTransfers  : filterByOrg(transfers)
+  const contextUsers     = isTester ? tUsers      : filterByOrg(users)
 
   return (
     <AppContext.Provider value={{
@@ -657,7 +658,8 @@ export function AppProvider({ children }) {
       loading,         dbLoading,
       sidebarOpen,     setSidebarOpen,
       sidebarCollapsed,setSidebarCollapsed,
-      users,           setUsers,
+      users:           contextUsers,
+      setUsers:        isTester ? setTUsers : wrappedSetUsers,
       currentUser,     setCurrentUser,
       activityLog,     setActivityLog,
       logActivity,
