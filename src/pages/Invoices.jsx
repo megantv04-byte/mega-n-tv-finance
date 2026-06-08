@@ -689,33 +689,28 @@ export default function Invoices() {
   function handleImportInvoices(rows) {
     console.log('[Import] =============== STARTING IMPORT ===============')
     console.log('[Import] Received rows:', rows.length)
-    console.log('[Import] First row:', JSON.stringify(rows[0], null, 2))
 
     setInvoices(prev => {
       console.log('[Import] Current invoices in state:', prev.length)
 
-      const existingIds = new Set(prev.map(i => i.id))
-      console.log('[Import] Existing IDs count:', existingIds.size)
-
-      const news = rows.filter(r => !existingIds.has(r.id))
-      console.log('[Import] New invoices to add:', news.length)
-
-      // riindekso IDs për të mos pasur konflikte
+      // ALWAYS import all rows - generate NEW IDs for all
+      // This prevents deduplication by ID which was filtering 940 invoices
       const maxNum = prev.reduce((m, i) => {
         const n = parseInt(i.id.replace('INV-','')) || 0
         return n > m ? n : m
       }, 0)
       console.log('[Import] Max existing invoice number:', maxNum)
 
-      const renumbered = news.map((r, i) => ({
+      // Generate new IDs for ALL imported invoices to avoid conflicts
+      const renumbered = rows.map((r, i) => ({
         ...r,
         id: `INV-${String(maxNum + i + 1).padStart(6, '0')}`,
       }))
 
-      console.log('[Import] After renumbering:', renumbered.length)
+      console.log('[Import] Imported invoices with new IDs:', renumbered.length)
       if (renumbered.length > 0) {
-        console.log('[Import] First renumbered:', renumbered[0])
-        console.log('[Import] Last renumbered:', renumbered[renumbered.length - 1])
+        console.log('[Import] First: ID=' + renumbered[0].id + ', Customer=' + renumbered[0].customer)
+        console.log('[Import] Last: ID=' + renumbered[renumbered.length - 1].id + ', Customer=' + renumbered[renumbered.length - 1].customer)
       }
 
       const result = [...prev, ...renumbered]
