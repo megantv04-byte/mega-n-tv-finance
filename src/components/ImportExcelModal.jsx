@@ -517,7 +517,11 @@ export default function ImportExcelModal({ entity, onImport, onClose }) {
             Anulo
           </button>
           <button
-            onClick={handleImport}
+            onClick={() => {
+              alert(`Button clicked! rows.length = ${rows?.length || 0}`)
+              console.log('[BUTTON] onClick fired, rows:', rows?.length)
+              handleImport()
+            }}
             disabled={!rows?.length || loading}
             className="px-5 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors"
           >
