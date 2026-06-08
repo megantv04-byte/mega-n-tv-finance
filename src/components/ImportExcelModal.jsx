@@ -455,6 +455,7 @@ export default function ImportExcelModal({ entity, onImport, onClose }) {
           {/* Preview */}
           {rows && (
             <div>
+              {console.error('🔴🔴🔴 ROWS STATE UPDATED! Length = ' + rows.length + ', First ID = ' + rows[0]?.id + ', Last ID = ' + rows[rows.length-1]?.id)}
               <div className="flex items-center gap-2 mb-3">
                 <CheckCircle2 size={16} className="text-green-500" />
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
