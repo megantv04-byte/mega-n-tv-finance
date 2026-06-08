@@ -101,9 +101,16 @@ export function AppProvider({ children }) {
   const filterByOrg = (data) => {
     if (isSuperAdmin) return data  // Superadmin sheh të gjithçka
     if (!currentOrgId) return data  // Nëse nuk ka user, shfaq të gjitha (mockData)
-    // Filtro vetëm të dhënat e organizatës aktuale
-    const filtered = data.filter(item => (item.orgId === currentOrgId || !item.orgId))
-    console.log(`[XFlow] Filtering by org "${currentOrgId}": ${data.length} items → ${filtered.length} items`)
+
+    // CRITICAL: Only show items that explicitly belong to this org
+    // Items without orgId are corrupted and should NOT be shown (prevents cross-org leakage)
+    const filtered = data.filter(item => item.orgId === currentOrgId)
+
+    if (data.length !== filtered.length) {
+      console.warn(`[XFlow] Filtering by org "${currentOrgId}": ${data.length} items → ${filtered.length} items (removed ${data.length - filtered.length} items without orgId)`)
+    } else {
+      console.log(`[XFlow] Filtering by org "${currentOrgId}": ${data.length} items`)
+    }
     return filtered
   }
 
@@ -111,45 +118,66 @@ export function AppProvider({ children }) {
   const wrappedSetInvoices = useCallback((fn) => {
     setInvoices(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
-      return Array.isArray(next)
-        ? next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
-        : next
+      if (!Array.isArray(next)) return next
+
+      // CRITICAL: Ensure ALL invoices have orgId to prevent cross-org leakage
+      if (!currentOrgId) {
+        console.error('🔴 SECURITY: Trying to set invoices without currentOrgId! This will break multi-tenant isolation!')
+        return prev
+      }
+
+      return next.map(item => ({
+        ...item,
+        orgId: currentOrgId  // FORCE orgId - never allow undefined!
+      }))
     })
   }, [currentOrgId])
 
   const wrappedSetCustomers = useCallback((fn) => {
     setCustomers(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
-      return Array.isArray(next)
-        ? next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
-        : next
+      if (!Array.isArray(next)) return next
+      if (!currentOrgId) {
+        console.error('🔴 SECURITY: Trying to set customers without currentOrgId!')
+        return prev
+      }
+      return next.map(item => ({ ...item, orgId: currentOrgId }))
     })
   }, [currentOrgId])
 
   const wrappedSetExpenses = useCallback((fn) => {
     setExpenses(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
-      return Array.isArray(next)
-        ? next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
-        : next
+      if (!Array.isArray(next)) return next
+      if (!currentOrgId) {
+        console.error('🔴 SECURITY: Trying to set expenses without currentOrgId!')
+        return prev
+      }
+      return next.map(item => ({ ...item, orgId: currentOrgId }))
     })
   }, [currentOrgId])
 
   const wrappedSetPayments = useCallback((fn) => {
     setPayments(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
-      return Array.isArray(next)
-        ? next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
-        : next
+      if (!Array.isArray(next)) return next
+      if (!currentOrgId) {
+        console.error('🔴 SECURITY: Trying to set payments without currentOrgId!')
+        return prev
+      }
+      return next.map(item => ({ ...item, orgId: currentOrgId }))
     })
   }, [currentOrgId])
 
   const wrappedSetTransfers = useCallback((fn) => {
     setTransfers(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
-      return Array.isArray(next)
-        ? next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
-        : next
+      if (!Array.isArray(next)) return next
+      if (!currentOrgId) {
+        console.error('🔴 SECURITY: Trying to set transfers without currentOrgId!')
+        return prev
+      }
+      return next.map(item => ({ ...item, orgId: currentOrgId }))
     })
   }, [currentOrgId])
 
