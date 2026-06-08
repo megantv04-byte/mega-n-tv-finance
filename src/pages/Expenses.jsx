@@ -62,7 +62,7 @@ function SlideSelect({ value, onChange, options, placeholder = 'Zgjidh llogarin�
 
 /* ── Modal shpenzimi ── */
 export function ExpenseModal({ expense, onClose }) {
-  const { setExpenses, depositAccounts, showToast } = useApp()
+  const { setExpenses, depositAccounts, showToast, currentOrgId } = useApp()
   const { canUsePartnerExpenseFields } = useFeatures()
   const isEdit = !!expense
   const today = new Date().toISOString().slice(0, 10)
@@ -87,7 +87,7 @@ export function ExpenseModal({ expense, onClose }) {
       setExpenses(prev => prev.map(e => e.id === expense.id ? payload : e))
       showToast('Shpenzimi u përditësua! ✓')
     } else {
-      setExpenses(prev => [{ ...payload, id: `EXP-${Date.now()}` }, ...prev])
+      setExpenses(prev => [{ ...payload, id: `EXP-${Date.now()}`, orgId: currentOrgId }, ...prev])
       showToast('Shpenzimi u regjistrua! ✓')
     }
     onClose()

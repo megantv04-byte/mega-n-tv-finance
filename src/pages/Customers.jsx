@@ -159,7 +159,7 @@ function ReferredBySelect({ value, onChange, excludeId }) {
    Modal — shto / edito klient
 ══════════════════════════════════════════════════════════ */
 export function CustomerModal({ customer, onClose }) {
-  const { setCustomers, showToast, representatives, setRepresentatives } = useApp()
+  const { setCustomers, showToast, representatives, setRepresentatives, currentOrgId } = useApp()
   const isEdit = !!customer
 
   const empty = {
@@ -205,6 +205,7 @@ export function CustomerModal({ customer, onClose }) {
       id:       isEdit ? customer.id       : `CUS-${Date.now()}`,
       total:    isEdit ? customer.total    : 0,
       invoices: isEdit ? customer.invoices : 0,
+      orgId:    isEdit ? customer.orgId    : currentOrgId,
     }
 
     // Sync referrer to representatives list if it's new
