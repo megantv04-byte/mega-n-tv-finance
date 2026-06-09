@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { StatusBadge, EmptyState, Pagination } from '../components/UI'
+import FormPageWrapper from '../components/FormPageWrapper'
 import InvoiceModal from './InvoiceModal'
 import PaymentModal from './PaymentModal'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
@@ -177,7 +178,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
 
         <button
           className={`${TB} border-gray-200 hover:bg-gray-50 text-gray-600`}
-          onClick={() => setModal(<InvoiceModal initialData={inv}/>)}
+          onClick={() => navigate(`invoices:${inv.id}:edit`)}
         >
           <Pencil size={13}/> Ndrysho
         </button>
@@ -669,12 +670,35 @@ export default function Invoices() {
     setModal, closeModal,
     showToast, fmt,
     currentOrgId, currentOrg,
+    page, navigate,
   } = useApp()
+
+  // Detect if we're in form mode (page like "invoices:create" or "invoices:ID:edit")
+  const pageMatch = page.split(':')
+  const isFormMode = pageMatch[0] === 'invoices' && (pageMatch[1] === 'create' || pageMatch[1]?.includes('-'))
+  const editInvoiceId = pageMatch[1]?.includes('-') ? pageMatch[1] : null
+  const editInvoice = editInvoiceId ? invoices.find(i => i.id === editInvoiceId) : null
+
+  // If in form mode, show full-page form
+  if (isFormMode) {
+    return (
+      <FormPageWrapper
+        title={editInvoice ? `Ndrysho Faturën — ${editInvoice.id}` : 'Faturë e Re'}
+        subtitle={editInvoice ? editInvoice.customer : 'Krijo një faturë të re'}
+        onBack={() => navigate('invoices')}
+      >
+        <InvoiceModal
+          invoice={editInvoice || undefined}
+          onClose={() => navigate('invoices')}
+        />
+      </FormPageWrapper>
+    )
+  }
 
   const [search,       setSearch]   = useState('')
   const [statusFilter, setStatus]   = useState('all')
   const [typeFilter,   setTypeFilter]= useState('all')   // 'all' | 'reseller' | 'individual'
-  const [page,         setPage]     = useState(1)
+  const [paginationPage,  setPaginationPage] = useState(1)
   const [perPage,      setPerPage]  = useState(50)
   const [sortField,    setSortField]= useState('id')
   const [sortDir,      setSortDir]  = useState('desc')
@@ -791,7 +815,7 @@ export default function Invoices() {
   const toggleSort = field => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     else { setSortField(field); setSortDir('asc') }
-    setPage(1)
+    setPaginationPage(1)
   }
 
   const sorted = [...filtered].sort((a, b) => {
@@ -843,7 +867,7 @@ export default function Invoices() {
             </div>
             <button
               className="flex items-center gap-1 btn btn-primary btn-sm text-xs px-2.5 py-1.5"
-              onClick={() => setModal(<InvoiceModal/>)}
+              onClick={() => navigate('invoices:create')}
             >
               <Plus size={12}/> Faturë
             </button>
@@ -974,7 +998,7 @@ export default function Invoices() {
             {/* New Invoice */}
             <button
               className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
-              onClick={() => setModal(<InvoiceModal/>)}
+              onClick={() => navigate('invoices:create')}
               title="Faturë e re"
             >
               +
@@ -996,7 +1020,7 @@ export default function Invoices() {
   }
 
   /* ── DEFAULT LAYOUT (full-width table) ── */
-  const paged = sorted.slice((page - 1) * perPage, page * perPage)
+  const paged = sorted.slice((paginationPage - 1) * perPage, paginationPage * perPage)
 
   /* Calculate stats */
   const pendingValue = invoices
@@ -1078,7 +1102,7 @@ export default function Invoices() {
             {/* New Invoice - Primary button with + icon */}
             <button
               className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
-              onClick={() => setModal(<InvoiceModal/>)}
+              onClick={() => navigate('invoices:create')}
               title="Faturë e re"
             >
               +
@@ -1159,13 +1183,13 @@ export default function Invoices() {
             className="bg-transparent border-none outline-none text-sm text-gray-600 w-full placeholder-gray-400"
             placeholder="Kërko fatura..."
             value={search}
-            onChange={e => { setSearch(e.target.value); setPage(1) }}
+            onChange={e => { setSearch(e.target.value); setPaginationPage(1) }}
           />
         </div>
         <select
           className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={statusFilter}
-          onChange={e => { setStatus(e.target.value); setPage(1) }}
+          onChange={e => { setStatus(e.target.value); setPaginationPage(1) }}
         >
           <option value="all">Të gjitha</option>
           <option value="paid">Paguar</option>
@@ -1178,7 +1202,7 @@ export default function Invoices() {
         <select
           className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={typeFilter}
-          onChange={e => { setTypeFilter(e.target.value); setPage(1) }}
+          onChange={e => { setTypeFilter(e.target.value); setPaginationPage(1) }}
         >
           <option value="all">Të gjithë</option>
           <option value="individual">👤 Klientë</option>
@@ -1187,7 +1211,7 @@ export default function Invoices() {
         <select
           className="bg-white border border-gray-200 rounded-lg px-2.5 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={perPage}
-          onChange={e => { setPerPage(Number(e.target.value)); setPage(1) }}
+          onChange={e => { setPerPage(Number(e.target.value)); setPaginationPage(1) }}
         >
           <option value={25}>25/faqe</option>
           <option value={50}>50/faqe</option>
@@ -1203,7 +1227,7 @@ export default function Invoices() {
             icon={FileText}
             title="Nuk u gjetën fatura"
             sub="Ndryshoni filtrat ose krijoni një faturë të re"
-            action={<button className="btn btn-primary mt-2" onClick={() => setModal(<InvoiceModal/>)}>+ Faturë e re</button>}
+            action={<button className="btn btn-primary mt-2" onClick={() => navigate('invoices:create')}>+ Faturë e re</button>}
           />
         ) : (
           <>
@@ -1341,7 +1365,7 @@ export default function Invoices() {
                                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
                                     onClick={e => {
                                       e.stopPropagation()
-                                      setModal(<InvoiceModal initialData={inv}/>)
+                                      navigate(`invoices:${inv.id}:edit`)
                                       setOpenDropdown(null)
                                     }}
                                   >
@@ -1446,7 +1470,7 @@ export default function Invoices() {
                 </tbody>
               </table>
             </div>
-            <Pagination page={page} total={filtered.length} perPage={perPage} onChange={setPage}/>
+            <Pagination page={paginationPage} total={filtered.length} perPage={perPage} onChange={setPaginationPage}/>
           </>
         )}
       </div>
