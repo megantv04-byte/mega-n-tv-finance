@@ -88,11 +88,29 @@ export default function Header() {
         <input className="bg-transparent border-none outline-none text-sm text-gray-600 dark:text-gray-300 w-full placeholder-gray-400" placeholder="Kërko..." />
       </div>
 
-      {/* Quick Add Button */}
+      {/* Quick Add Button - Context Aware */}
       <div className="relative flex-shrink-0">
         <button
           className="icon-btn bg-blue-600 text-white hover:bg-blue-700 rounded-lg p-2"
-          onClick={() => setAddOpen(v => !v)}
+          onClick={() => {
+            // Get the base page (remove :create, :edit, etc)
+            const basePage = page.split(':')[0]
+            // Map pages that have create functionality
+            const createPages = {
+              invoices: 'invoices:create',
+              customers: 'customers:create',
+              expenses: 'expenses:create',
+              payments: 'payments:create',
+              items: 'items:create',
+            }
+            if (createPages[basePage]) {
+              navigate(createPages[basePage])
+              setAddOpen(false)
+            } else {
+              // Show dropdown for pages without current context
+              setAddOpen(v => !v)
+            }
+          }}
           title="Shto element të ri"
         >
           <Plus size={18} />
@@ -101,7 +119,7 @@ export default function Header() {
           <div className="absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg shadow-lg z-50 w-48 py-1">
             <button
               onClick={() => {
-                navigate('invoices')
+                navigate('invoices:create')
                 setAddOpen(false)
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -111,7 +129,7 @@ export default function Header() {
             </button>
             <button
               onClick={() => {
-                navigate('expenses')
+                navigate('expenses:create')
                 setAddOpen(false)
               }}
               className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
