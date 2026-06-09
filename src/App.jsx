@@ -5,22 +5,24 @@ import RoleBasedRouter from './components/RoleBasedRouter'
 import Login from './pages/Login'
 import Sidebar from './components/Sidebar'
 import Header from './components/Header'
-import Dashboard from './pages/Dashboard'
-import Invoices from './pages/Invoices'
-import Customers from './pages/Customers'
-import ExpensesPage from './pages/Expenses'
-import Items from './pages/Items'
-import Payments from './pages/Payments'
-import Reports from './pages/Reports'
-import Settings from './pages/Settings'
-import Subscriptions from './pages/Subscriptions'
-import Suppliers from './pages/Suppliers'
-import UsersPage from './pages/Users'
-import CommunicationHistory from './pages/CommunicationHistory'
 import { Toast, LoadingSkeleton } from './components/UI'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import AutoNotificationService from './services/AutoNotificationService'
 import BackupService from './services/BackupService'
+
+// Lazy load all pages to reduce initial bundle size
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Invoices = lazy(() => import('./pages/Invoices'))
+const Customers = lazy(() => import('./pages/Customers'))
+const ExpensesPage = lazy(() => import('./pages/Expenses'))
+const Items = lazy(() => import('./pages/Items'))
+const Payments = lazy(() => import('./pages/Payments'))
+const Reports = lazy(() => import('./pages/Reports'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Subscriptions = lazy(() => import('./pages/Subscriptions'))
+const Suppliers = lazy(() => import('./pages/Suppliers'))
+const UsersPage = lazy(() => import('./pages/Users'))
+const CommunicationHistory = lazy(() => import('./pages/CommunicationHistory'))
 
 const ORG_PAGES = {
   dashboard:              Dashboard,
@@ -99,7 +101,11 @@ function OrgAppLayout() {
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         <Header />
         <main className={`flex-1 p-3 sm:p-5 md:p-6 overflow-y-auto ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-          {loading ? <LoadingSkeleton /> : <PageComponent />}
+          {loading ? <LoadingSkeleton /> : (
+            <Suspense fallback={<LoadingSkeleton />}>
+              <PageComponent />
+            </Suspense>
+          )}
         </main>
       </div>
 

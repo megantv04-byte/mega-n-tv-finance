@@ -70,7 +70,10 @@
       "Bash(Start-Sleep -Seconds 3)",
       "Bash(Get-Content \"C:\\\\Users\\\\enndy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-enndy-Downloads-financeflow\\\\92163b91-9035-4564-8582-b5da5f92a3ba\\\\tasks\\\\b2hbx8mz5.output\")",
       "Bash(Select-Object -Last 50)",
-      "Bash(curl -s http://localhost:5173/)"
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(cat > *)",
+      "Bash(git reset *)",
+      "Bash(sort -k5 -h -r)"
     ]
   }
 }
