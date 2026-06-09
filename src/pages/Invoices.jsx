@@ -679,18 +679,29 @@ export default function Invoices() {
   const editInvoiceId = pageMatch[1]?.includes('-') ? pageMatch[1] : null
   const editInvoice = editInvoiceId ? invoices.find(i => i.id === editInvoiceId) : null
 
-  // Declare the form component here so we can render it as a side panel
+  // Close modal if we leave form mode
+  useEffect(() => {
+    if (!isFormMode) {
+      closeModal()
+    }
+  }, [isFormMode, closeModal])
+
+  // Only render form if we're in form mode
+  // Use key to force remount when isFormMode changes
   const InvoiceFormPanel = isFormMode ? (
-    <FormPageWrapper
-      title={editInvoice ? `Ndrysho Faturën` : 'Faturë e Re'}
-      subtitle={editInvoice ? editInvoice.id : 'Krijo një faturë të re'}
-      onBack={() => navigate('invoices')}
-    >
-      <InvoiceModal
-        invoice={editInvoice || undefined}
-        onClose={() => navigate('invoices')}
-      />
-    </FormPageWrapper>
+    <div key={`invoice-form-${editInvoiceId || 'create'}`}>
+      <FormPageWrapper
+        title={editInvoice ? `Ndrysho Faturën` : 'Faturë e Re'}
+        subtitle={editInvoice ? editInvoice.id : 'Krijo një faturë të re'}
+        onBack={() => navigate('invoices')}
+      >
+        <InvoiceModal
+          key={`modal-${editInvoiceId || 'create'}`}
+          invoice={editInvoice || undefined}
+          onClose={() => navigate('invoices')}
+        />
+      </FormPageWrapper>
+    </div>
   ) : null
 
   const [search,       setSearch]   = useState('')
