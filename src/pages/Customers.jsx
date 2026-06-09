@@ -233,6 +233,7 @@ export function CustomerModal({ customer, onClose, isFormPage }) {
       setCustomers(prev => [payload, ...prev])
       showToast('Klienti u shtua me sukses! ✓')
     }
+    // Always call onClose to close the form (handles both modal and form page modes)
     onClose()
   }
 

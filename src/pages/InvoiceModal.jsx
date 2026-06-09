@@ -581,7 +581,7 @@ export default function InvoiceModal({ initialData, isFormPage }) {
       }, ...p])
       showToast('Fatura u krijua me sukses! ✓')
     }
-    closeModal()
+    onClose()
   }
 
   const formContent = (
