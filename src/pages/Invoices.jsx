@@ -755,8 +755,8 @@ export default function Invoices() {
   }
 
   const handleDeleteSelected = () => {
-    const count = invoices.length
-    setInvoices([])  // Delete ALL invoices
+    const count = selected.size
+    setInvoices(prev => prev.filter(i => !selected.has(i.id)))
     setSelected(new Set())
     setConfirmDelAll(false)
     showToast(`U fshihen ${count} fatura`, 'success')
@@ -1031,13 +1031,13 @@ export default function Invoices() {
           <button className="btn btn-outline btn-sm" onClick={() => setImportOpen(true)}>
             <FileSpreadsheet size={14}/> Import Excel
           </button>
-          {invoices.length > 0 && (
+          {selected.size > 0 && (
             <button
               className="btn btn-danger btn-sm flex items-center gap-2"
               onClick={() => setConfirmDelAll(true)}
-              title="Fshi të gjitha faturat në këtë organizatë"
+              title={`Fshi ${selected.size} faturën e zgjedhur`}
             >
-              <Trash2 size={14}/> Fshi të gjitha ({invoices.length})
+              <Trash2 size={14}/> Fshi ({selected.size})
             </button>
           )}
           <button className="btn btn-primary btn-sm" onClick={() => setModal(<InvoiceModal/>)}>
@@ -1062,14 +1062,14 @@ export default function Invoices() {
                 <Trash2 size={24} className="text-red-600" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-gray-900 dark:text-white text-lg">Fshi të gjitha {invoices.length} faturat?</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white text-lg">Fshi {selected.size} {selected.size === 1 ? 'faturën' : 'faturat'}?</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Kjo veprim nuk mund të rikthehej.</p>
               </div>
             </div>
 
             <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 mb-6 border border-red-200 dark:border-red-800">
               <p className="text-sm text-gray-700 dark:text-gray-300">
-                <span className="font-semibold">{invoices.length}</span> fatura do të fshihen përgjithmonë.
+                <span className="font-semibold">{selected.size}</span> {selected.size === 1 ? 'fatura' : 'fatura'} do të fshihen përgjithmonë.
               </p>
             </div>
 
@@ -1084,7 +1084,7 @@ export default function Invoices() {
                 onClick={handleDeleteSelected}
                 className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
               >
-                Po, fshi të gjitha
+                Po, fshi
               </button>
             </div>
           </div>
