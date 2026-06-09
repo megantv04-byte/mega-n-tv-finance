@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, memo } from 'react'
 import {
   Users, Mail, Phone, UserPlus, Search, X,
   Pencil, Monitor, Wifi, UserCheck, Globe, Filter,
@@ -377,7 +377,7 @@ export function CustomerModal({ customer, onClose }) {
 /* ══════════════════════════════════════════════════════════
    Karta e klientit
 ══════════════════════════════════════════════════════════ */
-function CustomerCard({ c, onEdit, fmt, isLatePayer, onDelete, checked, onToggleSelect }) {
+const CustomerCard = memo(function CustomerCard({ c, onEdit, fmt, isLatePayer, onDelete, checked, onToggleSelect }) {
   const phone  = cleanPhone(c.phone)
   const isReseller = c.type === 'reseller'
 
@@ -541,7 +541,7 @@ function CustomerCard({ c, onEdit, fmt, isLatePayer, onDelete, checked, onToggle
       </div>
     </div>
   )
-}
+})
 
 /* ══════════════════════════════════════════════════════════
    Faqja kryesore
@@ -554,6 +554,8 @@ export default function Customers() {
   const [importOpen,    setImportOpen]    = useState(false)
   const [selected,      setSelected]      = useState(new Set())
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null) // null | 'single' | 'multiple'
+  const [currentPage,   setCurrentPage]   = useState(1)
+  const ITEMS_PER_PAGE = 20
 
   function handleImportCustomers(rows) {
     setCustomers(prev => {
@@ -597,10 +599,16 @@ export default function Customers() {
   }
 
   const toggleSelectAll = () => {
-    if (selected.size === filtered.length) {
-      setSelected(new Set())
+    const pageIds = new Set(paginatedCustomers.map(c => c.id))
+    const allPageSelected = paginatedCustomers.every(c => selected.has(c.id))
+    if (allPageSelected) {
+      const newSelected = new Set(selected)
+      pageIds.forEach(id => newSelected.delete(id))
+      setSelected(newSelected)
     } else {
-      setSelected(new Set(filtered.map(c => c.id)))
+      const newSelected = new Set(selected)
+      pageIds.forEach(id => newSelected.add(id))
+      setSelected(newSelected)
     }
   }
 
@@ -644,6 +652,17 @@ export default function Customers() {
 
   const openAdd  = ()     => setModal(<CustomerModal onClose={closeModal} />)
   const openEdit = cust   => setModal(<CustomerModal customer={cust} onClose={closeModal} />)
+
+  /* Pagination */
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIdx = startIdx + ITEMS_PER_PAGE
+  const paginatedCustomers = filtered.slice(startIdx, endIdx)
+
+  // Reset to page 1 when filters change
+  if (currentPage > totalPages && currentPage > 1) {
+    setCurrentPage(1)
+  }
 
   return (
     <div>
@@ -701,17 +720,17 @@ export default function Customers() {
       {/* Filtrat */}
       <div className="flex flex-wrap items-center gap-2 mb-5">
         {/* Select All Checkbox */}
-        {filtered.length > 0 && (
+        {paginatedCustomers.length > 0 && (
           <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
             <input
               type="checkbox"
-              checked={filtered.length > 0 && selected.size === filtered.length}
+              checked={paginatedCustomers.length > 0 && paginatedCustomers.every(c => selected.has(c.id))}
               onChange={toggleSelectAll}
               className="w-5 h-5 rounded border-gray-300 text-blue-600 cursor-pointer"
-              title="Zgjidh të gjithë"
+              title="Zgjidh faqen"
             />
             <span className="text-xs text-gray-600 font-medium">
-              {selected.size > 0 ? `${selected.size} zgjedhur` : 'Zgjidh të gjithë'}
+              {selected.size > 0 ? `${selected.size} zgjedhur` : 'Zgjidh faqen'}
             </span>
           </div>
         )}
@@ -778,20 +797,72 @@ export default function Customers() {
           )}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(c => (
-            <CustomerCard
-              key={c.id}
-              c={c}
-              onEdit={openEdit}
-              fmt={fmt}
-              isLatePayer={latePayerNames.has(c.name)}
-              onDelete={handleDeleteCustomer}
-              checked={selected.has(c.id)}
-              onToggleSelect={() => toggleSelectCustomer(c.id)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {paginatedCustomers.map(c => (
+              <CustomerCard
+                key={c.id}
+                c={c}
+                onEdit={openEdit}
+                fmt={fmt}
+                isLatePayer={latePayerNames.has(c.name)}
+                onDelete={handleDeleteCustomer}
+                checked={selected.has(c.id)}
+                onToggleSelect={() => toggleSelectCustomer(c.id)}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-8 pb-4">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                ← Mbrapa
+              </button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        currentPage === pageNum
+                          ? 'bg-blue-600 text-white'
+                          : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  )
+                })}
+              </div>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Përpara →
+              </button>
+              <span className="text-xs text-gray-400 ml-2">
+                Faqja {currentPage} nga {totalPages}
+              </span>
+            </div>
+          )}
+        </>
       )}
 
       {/* Delete confirmation dialog */}
