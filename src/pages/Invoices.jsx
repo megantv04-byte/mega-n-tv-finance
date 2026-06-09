@@ -998,51 +998,88 @@ export default function Invoices() {
   /* ── DEFAULT LAYOUT (full-width table) ── */
   const paged = sorted.slice((page - 1) * perPage, page * perPage)
 
+  /* Calculate stats */
+  const today = new Date().toISOString().slice(0, 10)
+  const pendingValue = invoices
+    .filter(i => i.status === 'pending')
+    .reduce((sum, i) => sum + (i.amount || 0), 0)
+  const overdueValue = invoices
+    .filter(i => i.status === 'overdue' || (i.status === 'pending' && i.due && i.due < today))
+    .reduce((sum, i) => sum + (i.amount || 0), 0)
+
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-gray-800">Faturat</h2>
-          <p className="text-sm text-gray-400 mt-0.5">{invoices.length} fatura gjithsej</p>
-        </div>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Export - Icon only */}
-          <button
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-            title="Eksporto faturat"
-          >
-            <Download size={16}/>
-          </button>
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Faturat</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{invoices.length} fatura gjithsej</p>
+          </div>
 
-          {/* Import - Icon only */}
-          <button
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-            onClick={() => setImportOpen(true)}
-            title="Importo Excel"
-          >
-            <FileSpreadsheet size={16}/>
-          </button>
+          {/* Stats in the middle */}
+          <div className="hidden md:flex items-center gap-6">
+            <div className="flex flex-col">
+              <p className="text-xs text-gray-400 font-medium">Në pritje</p>
+              <p className="text-lg font-bold text-amber-600">{fmt(pendingValue)}</p>
+            </div>
+            <div className="flex flex-col">
+              <p className="text-xs text-gray-400 font-medium">Të vonuara</p>
+              <p className="text-lg font-bold text-red-600">{fmt(overdueValue)}</p>
+            </div>
+          </div>
 
-          {/* Delete selected - Show only when items selected */}
-          {selected.size > 0 && (
+        {/* Action buttons */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Export - Icon only */}
             <button
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-              onClick={() => setConfirmDelAll(true)}
-              title={`Fshi ${selected.size}`}
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              title="Eksporto faturat"
             >
-              <Trash2 size={16}/>
+              <Download size={16}/>
             </button>
-          )}
 
-          {/* New Invoice - Primary button with + icon */}
-          <button
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
-            onClick={() => setModal(<InvoiceModal/>)}
-            title="Faturë e re"
-          >
-            +
-          </button>
+            {/* Import - Icon only */}
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              onClick={() => setImportOpen(true)}
+              title="Importo Excel"
+            >
+              <FileSpreadsheet size={16}/>
+            </button>
+
+            {/* Delete selected - Show only when items selected */}
+            {selected.size > 0 && (
+              <button
+                className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                onClick={() => setConfirmDelAll(true)}
+                title={`Fshi ${selected.size}`}
+              >
+                <Trash2 size={16}/>
+              </button>
+            )}
+
+            {/* New Invoice - Primary button with + icon */}
+            <button
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
+              onClick={() => setModal(<InvoiceModal/>)}
+              title="Faturë e re"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile stats (show on small screens) */}
+        <div className="md:hidden flex gap-3">
+          <div className="flex-1 bg-amber-50 rounded-lg p-3 border border-amber-100">
+            <p className="text-xs text-amber-600 font-medium">Në pritje</p>
+            <p className="text-base font-bold text-amber-700">{fmt(pendingValue)}</p>
+          </div>
+          <div className="flex-1 bg-red-50 rounded-lg p-3 border border-red-100">
+            <p className="text-xs text-red-600 font-medium">Të vonuara</p>
+            <p className="text-base font-bold text-red-700">{fmt(overdueValue)}</p>
+          </div>
         </div>
       </div>
       {importOpen && (
