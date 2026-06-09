@@ -435,8 +435,8 @@ function calculateSubscriptionExpiry(baseDate, months) {
 /* ══════════════════════════════════════════════════════════
    InvoiceModal
 ══════════════════════════════════════════════════════════ */
-export default function InvoiceModal({ initialData, isFormPage }) {
-  const { invoices, customers, setCustomers, items: products, setInvoices, showToast, closeModal, representatives, setRepresentatives } = useApp()
+export default function InvoiceModal({ initialData, isFormPage, onClose }) {
+  const { invoices, customers, setCustomers, items: products, setInvoices, showToast, closeModal, navigate, representatives, setRepresentatives } = useApp()
 
   const isEdit = !!(initialData?.id)
   const due3d  = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
