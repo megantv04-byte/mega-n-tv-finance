@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import {
   Receipt, Trash2, Plus, Search, X, RefreshCw,
   ChevronLeft, ChevronRight, Filter, Users, Wallet, FileSpreadsheet,
@@ -6,6 +6,7 @@ import {
 import { useApp } from '../context/AppContext'
 import { useFeatures } from '../features/useFeatures'
 import { EmptyState, Modal, FormGroup, Pagination } from '../components/UI'
+import FormPageWrapper from '../components/FormPageWrapper'
 import { expenseTypes, depositedToOptions } from '../data/mockData'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 
@@ -254,7 +255,7 @@ function DeleteConfirm({ exp, onClose }) {
 
 /* ══════════════════════════════════════════════════════════ */
 export default function ExpensesPage() {
-  const { expenses, setExpenses, setModal, closeModal, fmt, showToast } = useApp()
+  const { expenses, setExpenses, closeModal, fmt, showToast, page, navigate } = useApp()
 
   const [search,      setSearch]     = useState('')
   const [partnerFilt, setPartner]    = useState('all')
@@ -265,6 +266,19 @@ export default function ExpensesPage() {
   const [sortField,   setSortField]  = useState('date')
   const [sortDir,     setSortDir]    = useState('desc')
   const [importOpen,  setImportOpen] = useState(false)
+
+  // Detect if we're in form mode (page like "expenses:create" or "expenses:ID:edit")
+  const pageMatch = page.split(':')
+  const isFormMode = pageMatch[0] === 'expenses' && (pageMatch[1] === 'create' || pageMatch[1]?.includes('EXP-'))
+  const editExpenseId = pageMatch[1]?.includes('EXP-') ? pageMatch[1] : null
+  const editExpense = editExpenseId ? expenses.find(e => e.id === editExpenseId) : null
+
+  // Close modal if we leave form mode
+  useEffect(() => {
+    if (!isFormMode) {
+      closeModal()
+    }
+  }, [isFormMode, closeModal])
 
   function handleImportExpenses(rows) {
     setExpenses(prev => {
@@ -317,9 +331,9 @@ export default function ExpensesPage() {
   const samkiTotal = expenses.filter(e => e.paidBy === 'Samki').reduce((s, e) => s + e.amount, 0)
   const recurTotal = expenses.filter(e => e.recurring).reduce((s, e) => s + e.amount, 0)
 
-  const openAdd    = ()  => setModal(<ExpenseModal onClose={closeModal} />)
-  const openEdit   = e   => setModal(<ExpenseModal expense={e} onClose={closeModal} />)
-  const openDelete = e   => setModal(<DeleteConfirm exp={e} onClose={closeModal} />)
+  const openAdd    = ()  => navigate('expenses:create')
+  const openEdit   = e   => navigate(`expenses:${e.id}:edit`)
+  const openDelete = e   => navigate(`expenses:${e.id}:delete`)
 
   /* recurring unique items (by type+vendor) for the recurring section */
   const recurringItems = useMemo(() => {
@@ -593,6 +607,23 @@ export default function ExpensesPage() {
           )}
 
           <Pagination page={pg} total={filtered.length} perPage={perPage} onChange={setPg} />
+        </div>
+      )}
+
+      {/* Form Side Panel */}
+      {isFormMode && pageMatch[1] !== 'delete' && (
+        <div key={`expense-form-${editExpenseId || 'create'}`}>
+          <FormPageWrapper
+            title={editExpense ? `Ndrysho Shpenzimin` : 'Shpenzim i Ri'}
+            subtitle={editExpense ? `${editExpense.type} - ${fmt(editExpense.amount)}` : 'Krijo një shpenzim të ri'}
+            onBack={() => navigate('expenses')}
+          >
+            <ExpenseModal
+              key={`modal-${editExpenseId || 'create'}`}
+              expense={editExpense || undefined}
+              onClose={() => navigate('expenses')}
+            />
+          </FormPageWrapper>
         </div>
       )}
     </div>

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Avatar, Modal, FormGroup, EmptyState } from '../components/UI'
+import FormPageWrapper from '../components/FormPageWrapper'
 import { countries } from '../data/mockData'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 import { ContactImportButton } from '../features/contacts'
@@ -547,7 +548,7 @@ const CustomerCard = memo(function CustomerCard({ c, onEdit, fmt, isLatePayer, o
    Faqja kryesore
 ══════════════════════════════════════════════════════════ */
 export default function Customers() {
-  const { customers, setCustomers, setModal, closeModal, fmt, invoices, showToast } = useApp()
+  const { customers, setCustomers, closeModal, fmt, invoices, showToast, page, navigate } = useApp()
   const [search,        setSearch]        = useState('')
   const [typeFilt,      setTypeFilt]      = useState('all')
   const [countryFilt,   setCountryFilt]   = useState('all')
@@ -556,6 +557,19 @@ export default function Customers() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null) // null | 'single' | 'multiple'
   const [currentPage,   setCurrentPage]   = useState(1)
   const ITEMS_PER_PAGE = 20
+
+  // Detect if we're in form mode (page like "customers:create" or "customers:ID:edit")
+  const pageMatch = page.split(':')
+  const isFormMode = pageMatch[0] === 'customers' && (pageMatch[1] === 'create' || pageMatch[1]?.includes('CUS-'))
+  const editCustomerId = pageMatch[1]?.includes('CUS-') ? pageMatch[1] : null
+  const editCustomer = editCustomerId ? customers.find(c => c.id === editCustomerId) : null
+
+  // Close modal if we leave form mode
+  useEffect(() => {
+    if (!isFormMode) {
+      closeModal()
+    }
+  }, [isFormMode, closeModal])
 
   function handleImportCustomers(rows) {
     setCustomers(prev => {
@@ -650,8 +664,8 @@ export default function Customers() {
     .map(co => ({ co, count: customers.filter(c => c.country === co).length }))
     .sort((a, b) => b.count - a.count)[0]
 
-  const openAdd  = ()     => setModal(<CustomerModal onClose={closeModal} />)
-  const openEdit = cust   => setModal(<CustomerModal customer={cust} onClose={closeModal} />)
+  const openAdd  = ()     => navigate('customers:create')
+  const openEdit = cust   => navigate(`customers:${cust.id}:edit`)
 
   /* Pagination */
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
@@ -899,6 +913,23 @@ export default function Customers() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Form Side Panel */}
+      {isFormMode && (
+        <div key={`customer-form-${editCustomerId || 'create'}`}>
+          <FormPageWrapper
+            title={editCustomer ? `Ndrysho Klientin` : 'Klient i Ri'}
+            subtitle={editCustomer ? editCustomer.name : 'Krijo një klient të ri'}
+            onBack={() => navigate('customers')}
+          >
+            <CustomerModal
+              key={`modal-${editCustomerId || 'create'}`}
+              customer={editCustomer || undefined}
+              onClose={() => navigate('customers')}
+            />
+          </FormPageWrapper>
         </div>
       )}
     </div>

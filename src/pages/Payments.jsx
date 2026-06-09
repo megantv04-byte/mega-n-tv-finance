@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   CreditCard, Download, Search, X, Filter,
   Pencil, Trash2, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { EmptyState, Pagination } from '../components/UI'
+import FormPageWrapper from '../components/FormPageWrapper'
 import PaymentModal from './PaymentModal'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 
@@ -91,8 +92,9 @@ export default function Payments() {
   const {
     payments, setPayments,
     invoices, setInvoices,
-    setModal, closeModal,
+    closeModal,
     showToast, fmt,
+    page, navigate,
   } = useApp()
 
   const [search,      setSearch]    = useState('')
@@ -105,6 +107,19 @@ export default function Payments() {
   const [sortDir,     setSortDir]   = useState('desc')
   const [deletingId,  setDeletingId] = useState(null)
   const [importOpen,  setImportOpen] = useState(false)
+
+  // Detect if we're in form mode (page like "payments:create" or "payments:ID:edit")
+  const pageMatch = page.split(':')
+  const isFormMode = pageMatch[0] === 'payments' && (pageMatch[1] === 'create' || pageMatch[1]?.includes('PAY-'))
+  const editPaymentId = pageMatch[1]?.includes('PAY-') ? pageMatch[1] : null
+  const editPayment = editPaymentId ? payments.find(p => p.id === editPaymentId) : null
+
+  // Close modal if we leave form mode
+  useEffect(() => {
+    if (!isFormMode) {
+      closeModal()
+    }
+  }, [isFormMode, closeModal])
 
   const months  = getMonths(payments)
   const methods = [...new Set(payments.map(p => p.method))]
@@ -148,8 +163,8 @@ export default function Payments() {
   const enndiNet   = filtered.filter(p => p.depositedTo === 'Enndy').reduce((s, p) => s + p.net, 0)
   const samkiNet   = filtered.filter(p => p.depositedTo === 'Samki').reduce((s, p) => s + p.net, 0)
 
-  const openNewPayment  = ()  => setModal(<PaymentModal onClose={closeModal} />)
-  const openEditPayment = (p) => setModal(<PaymentModal payment={p} onClose={closeModal} />)
+  const openNewPayment  = ()  => navigate('payments:create')
+  const openEditPayment = (p) => navigate(`payments:${p.id}:edit`)
 
   function handleImportPayments(rows) {
     // Shto pagesat e reja (shmang dublikatat sipas id)
@@ -487,6 +502,23 @@ export default function Payments() {
               {enndiNet > samkiNet ? 'Enndy' : 'Samki'} ka marrë më shumë këtë muaj.
             </div>
           )}
+        </div>
+      )}
+
+      {/* Form Side Panel */}
+      {isFormMode && (
+        <div key={`payment-form-${editPaymentId || 'create'}`}>
+          <FormPageWrapper
+            title={editPayment ? `Ndrysho Pagesën` : 'Pagese e Re'}
+            subtitle={editPayment ? `${fmt(editPayment.amount)} - ${editPayment.method}` : 'Regjistro një pagesë të re'}
+            onBack={() => navigate('payments')}
+          >
+            <PaymentModal
+              key={`modal-${editPaymentId || 'create'}`}
+              payment={editPayment || undefined}
+              onClose={() => navigate('payments')}
+            />
+          </FormPageWrapper>
         </div>
       )}
     </div>

@@ -1,7 +1,8 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Package, Plus, Search, Pencil, Trash2, X, ChevronUp, ChevronDown, Lock, Unlock } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Modal, FormGroup, EmptyState, Pagination } from '../components/UI'
+import FormPageWrapper from '../components/FormPageWrapper'
 import { salesAccounts } from '../data/mockData'
 
 /* ─── helpers ───────────────────────────────────────────── */
@@ -239,7 +240,7 @@ function DeleteConfirm({ item, onClose }) {
 
 /* ─── Faqja kryesore ─────────────────────────────────────── */
 export default function Items() {
-  const { items, setModal, closeModal, fmt } = useApp()
+  const { items, closeModal, fmt, page, navigate } = useApp()
 
   const [search,      setSearch]      = useState('')
   const [pg,          setPg]          = useState(1)
@@ -247,6 +248,19 @@ export default function Items() {
   const [sortDir,     setSortDir]     = useState('asc')
   const [pinUnlocked, setPinUnlocked] = useState(false)
   const [showPin,     setShowPin]     = useState(false)
+
+  // Detect if we're in form mode (page like "items:create" or "items:ID:edit")
+  const pageMatch = page.split(':')
+  const isFormMode = pageMatch[0] === 'items' && (pageMatch[1] === 'create' || pageMatch[1]?.includes('ITM-'))
+  const editItemId = pageMatch[1]?.includes('ITM-') ? pageMatch[1] : null
+  const editItem = editItemId ? items.find(i => i.id === editItemId) : null
+
+  // Close modal if we leave form mode
+  useEffect(() => {
+    if (!isFormMode) {
+      closeModal()
+    }
+  }, [isFormMode, closeModal])
 
   const handleLockToggle = () => {
     if (pinUnlocked) setPinUnlocked(false)
@@ -283,9 +297,9 @@ export default function Items() {
       ? sortDir === 'asc' ? <ChevronUp size={13} className="text-blue-500"/> : <ChevronDown size={13} className="text-blue-500"/>
       : <ChevronUp size={13} className="text-gray-300"/>
 
-  const openAdd    = ()    => setModal(<ItemModal onClose={closeModal} />)
-  const openEdit   = item  => setModal(<ItemModal item={item} onClose={closeModal} />)
-  const openDelete = item  => setModal(<DeleteConfirm item={item} onClose={closeModal} />)
+  const openAdd    = ()    => navigate('items:create')
+  const openEdit   = item  => navigate(`items:${item.id}:edit`)
+  const openDelete = item  => navigate(`items:${item.id}:delete`)
 
   const masked = <span className="text-gray-300 font-mono text-xs tracking-widest select-none cursor-pointer" onClick={() => setShowPin(true)}>••••</span>
 
@@ -533,6 +547,23 @@ export default function Items() {
           </table>
           </div>
           <Pagination page={pg} total={filtered.length} perPage={PER_PAGE} onChange={setPg} />
+        </div>
+      )}
+
+      {/* Form Side Panel */}
+      {isFormMode && pageMatch[1] !== 'delete' && (
+        <div key={`item-form-${editItemId || 'create'}`}>
+          <FormPageWrapper
+            title={editItem ? `Ndrysho Produktin` : 'Produkt i Ri'}
+            subtitle={editItem ? `${fmt(editItem.salePrice)} - ${editItem.account}` : 'Krijo një produkt ose shërbim të ri'}
+            onBack={() => navigate('items')}
+          >
+            <ItemModal
+              key={`modal-${editItemId || 'create'}`}
+              item={editItem || undefined}
+              onClose={() => navigate('items')}
+            />
+          </FormPageWrapper>
         </div>
       )}
     </div>
