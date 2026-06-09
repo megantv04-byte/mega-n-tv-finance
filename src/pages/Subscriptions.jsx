@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo, useMemo } from 'react'
 import { Bell, MessageCircle, Send, Calendar, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
@@ -47,7 +47,7 @@ async function sendWA(phone, message) {
 }
 
 /* ── Single row card ── */
-function SubRow({ inv, phone, urgency, today, sentToday }) {
+const SubRow = memo(function SubRow({ inv, phone, urgency, today, sentToday }) {
   const { fmt } = useApp()
   const msg = encodeURIComponent(buildRenewalMsg(inv))
 
@@ -141,15 +141,22 @@ function SubRow({ inv, phone, urgency, today, sentToday }) {
       </td>
     </tr>
   )
-}
+})
 
 /* ── Section block ── */
-function Section({ title, color, items, today, sentIds }) {
+const Section = memo(function Section({ title, color, items, today, sentIds, itemsPerPage = 30 }) {
   const { customers } = useApp()
+  const [page, setPage] = useState(1)
+
   if (!items.length) return null
 
   const getPhone = name => cleanPhone(customers.find(c => c.name === name)?.phone || '')
   const urgency  = color === 'red' ? 'high' : color === 'amber' ? 'medium' : 'low'
+
+  const totalPages = Math.ceil(items.length / itemsPerPage)
+  const startIdx = (page - 1) * itemsPerPage
+  const endIdx = startIdx + itemsPerPage
+  const paginatedItems = items.slice(startIdx, endIdx)
 
   return (
     <div className="mb-6">
@@ -181,7 +188,7 @@ function Section({ title, color, items, today, sentIds }) {
               </tr>
             </thead>
             <tbody>
-              {items.map(inv => (
+              {paginatedItems.map(inv => (
                 <SubRow
                   key={inv.id}
                   inv={inv}
@@ -195,9 +202,30 @@ function Section({ title, color, items, today, sentIds }) {
           </table>
         </div>
       </div>
+
+      {/* Pagination for section */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-3">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="px-2 py-1 text-xs rounded border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-gray-50"
+          >
+            ←
+          </button>
+          <span className="text-xs text-gray-500">{page}/{totalPages}</span>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="px-2 py-1 text-xs rounded border border-gray-200 text-gray-600 disabled:opacity-50 hover:bg-gray-50"
+          >
+            →
+          </button>
+        </div>
+      )}
     </div>
   )
-}
+})
 
 /* ══════════════════════════════════════════════════════════
    Main page
