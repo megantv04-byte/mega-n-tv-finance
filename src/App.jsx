@@ -40,8 +40,15 @@ const ORG_PAGES = {
 }
 
 function OrgAppLayout() {
-  const { page, loading, toast, setToast, modal, darkMode, invoices, customers, items, payments, expenses, users, showToast } = useApp()
-  const PageComponent = ORG_PAGES[page] || Dashboard
+  const { page, navigate, loading, toast, setToast, modal, darkMode, invoices, customers, items, payments, expenses, users, showToast } = useApp()
+
+  // Parse nested routes like "invoices:create" or "invoices:INV-123:edit"
+  const pageMatch = page.split(':')
+  const basePage = pageMatch[0]
+  const action = pageMatch[1] // 'create' or id
+  const editId = pageMatch[2] // Only for edit routes
+
+  const PageComponent = ORG_PAGES[basePage] || Dashboard
 
   // Check for pending auto-notifications when app loads
   useEffect(() => {
