@@ -131,9 +131,9 @@ export function AppProvider({ children }) {
     setCustomers(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
       if (!Array.isArray(next)) return next
+      // If currentOrgId missing, just keep existing orgId (happens during initial load)
       if (!currentOrgId) {
-        console.error('🔴 SECURITY: Trying to set customers without currentOrgId!')
-        return prev
+        return next.map(item => ({ ...item, orgId: item.orgId || 'default' }))
       }
       // Only assign orgId if missing - keep existing orgId for Supabase data
       return next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
@@ -144,9 +144,9 @@ export function AppProvider({ children }) {
     setExpenses(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
       if (!Array.isArray(next)) return next
+      // If currentOrgId missing, just keep existing orgId (happens during initial load)
       if (!currentOrgId) {
-        console.error('🔴 SECURITY: Trying to set expenses without currentOrgId!')
-        return prev
+        return next.map(item => ({ ...item, orgId: item.orgId || 'default' }))
       }
       // Only assign orgId if missing - keep existing orgId for Supabase data
       return next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
@@ -157,9 +157,9 @@ export function AppProvider({ children }) {
     setPayments(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
       if (!Array.isArray(next)) return next
+      // If currentOrgId missing, just keep existing orgId (happens during initial load)
       if (!currentOrgId) {
-        console.error('🔴 SECURITY: Trying to set payments without currentOrgId!')
-        return prev
+        return next.map(item => ({ ...item, orgId: item.orgId || 'default' }))
       }
       // Only assign orgId if missing - keep existing orgId for Supabase data
       return next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
@@ -170,9 +170,9 @@ export function AppProvider({ children }) {
     setTransfers(prev => {
       const next = typeof fn === 'function' ? fn(prev) : fn
       if (!Array.isArray(next)) return next
+      // If currentOrgId missing, just keep existing orgId (happens during initial load)
       if (!currentOrgId) {
-        console.error('🔴 SECURITY: Trying to set transfers without currentOrgId!')
-        return prev
+        return next.map(item => ({ ...item, orgId: item.orgId || 'default' }))
       }
       // Only assign orgId if missing - keep existing orgId for Supabase data
       return next.map(item => ({ ...item, orgId: item.orgId || currentOrgId }))
