@@ -50,7 +50,14 @@ export function AppProvider({ children }) {
   const [darkMode,         setDarkMode]         = useState(() => localStorage.getItem('xflow_dark') === 'true')
   const [toast,            setToast]            = useState(null)
   const [modal,            setModal]            = useState(null)
-  const [page,             setPage]             = useState('dashboard') // Always start at dashboard
+  const [page,             setPage]             = useState(() => {
+    // Read page from URL on load, default to dashboard
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location)
+      return url.searchParams.get('page') || 'dashboard'
+    }
+    return 'dashboard'
+  })
   const [loading,          setLoading]          = useState(false)
   const [dbLoading,        setDbLoading]        = useState(!!supabase) // loading initial kur ka Supabase
   const [sidebarOpen,      setSidebarOpen]      = useState(false)
@@ -574,6 +581,10 @@ export function AppProvider({ children }) {
     }
 
     setPage(p)
+    // Update URL so page state is preserved on refresh
+    const url = new URL(window.location)
+    url.searchParams.set('page', p)
+    window.history.pushState({ page: p }, '', url.toString())
     setSidebarOpen(false)
     setLoading(true)
     setTimeout(() => setLoading(false), 350)
