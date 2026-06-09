@@ -1,3 +1,4 @@
+import { supabase } from '../lib/supabase'
 import { useState } from 'react'
 import { Eye, EyeOff, AlertCircle, Zap } from 'lucide-react'
 
@@ -8,21 +9,38 @@ export default function Login({ users = [], onLogin }) {
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState('')
 
-  const submit = (e) => {
-    e?.preventDefault()
-    if (!username || !password) { setError('Plotëso të gjitha fushat.'); return }
-    setLoading(true); setError('')
-    setTimeout(() => {
-      setLoading(false)
-      const user = users.find(
-        u => u.username.toLowerCase() === username.trim().toLowerCase() &&
-             u.password === password &&
-             u.active !== false
-      )
-      if (user) { onLogin(user) }
-      else { setError('Username ose fjalëkalim i gabuar.') }
-    }, 800)
+  const submit = async (e) => {
+  e?.preventDefault()
+  if (!username || !password) { setError('Plotëso të gjitha fushat.'); return }
+  
+  setLoading(true)
+  setError('')
+  
+  try {
+    // Login with Supabase auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username, 
+      password
+    })
+    
+    if (error) throw new Error(error.message)
+    
+    // Fetch user profile to get org_id
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', username)
+      .single()
+    
+    // Call onLogin with user + org_id
+    onLogin({ ...data.user, orgId: profile?.org_id })
+    
+  } catch (err) {
+    setError(err.message || 'Login failed')
+  } finally {
+    setLoading(false)
   }
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center p-4">
@@ -46,18 +64,18 @@ export default function Login({ users = [], onLogin }) {
         <p className="text-sm text-gray-400 mb-6">Kyçu me llogarinë tënde</p>
 
         <form onSubmit={submit} autoComplete="on">
-          {/* Username */}
+          {/* Email */}
           <div className="mb-4">
-            <label className="form-label" htmlFor="login-username">Username</label>
+            <label className="form-label" htmlFor="login-username">Email</label>
             <input
               id="login-username"
-              name="username"
+              name="email"
               className="form-control"
-              type="text"
-              autoComplete="username"
+              type="email"
+              autoComplete="email"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder="username..."
+              placeholder="megashtv@gmail.com"
               autoFocus
             />
           </div>
