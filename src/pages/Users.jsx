@@ -215,7 +215,7 @@ export default function UsersPage() {
       const timeA = new Date(a.timestamp || 0).getTime()
       const timeB = new Date(b.timestamp || 0).getTime()
       return timeB - timeA
-    }).slice(0, 50)
+    })
   }, [activityLog, logUserFilter, logSearch])
 
   return (

@@ -7,6 +7,17 @@ import BackupService from '../services/BackupService'
 export default function Settings() {
   const { showToast, paymentModes, setPaymentModes, depositAccounts, setDepositAccounts, logout, invoices, customers, items, payments, expenses, users, setInvoices, setCustomers, setItems, setPayments, setExpenses, currentUser } = useApp()
   const fileInputRef = useRef(null)
+  const [editingField, setEditingField] = useState(null)
+  const [editValue, setEditValue] = useState('')
+  const [companyData, setCompanyData] = useState({
+    companyName: 'XFlow Studio',
+    email: 'info@xflow.ks',
+    phone: '+383 44 100 200',
+    address: 'Rruga Nënë Tereza 12, Prishtinë',
+    language: 'Shqip (Kosovë)',
+    dateFormat: 'DD/MM/YYYY',
+    timezone: 'UTC+1 (CET)',
+  })
   const [toggles, setToggles] = useState({
     emailNotif: true, smsNotif: false, autoInvoice: true,
     twofa: false, darkReports: false, weeklyDigest: true,
@@ -216,21 +227,54 @@ export default function Settings() {
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{title}</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-              {rows.map((row, i) => (
+              {rows.map((row, i) => {
+                const fieldKey = row.label.toLowerCase().replace(/\s+/g, '')
+                const isEditing = editingField === `${title}-${i}`
+                return (
                 <div key={i} className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                  <div>
+                  <div className="flex-1">
                     <p className="text-sm font-semibold text-gray-800">{row.label}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{row.sub}</p>
+                    {isEditing && isAdmin && !row.key ? (
+                      <input
+                        autoFocus
+                        className="form-control text-xs mt-1.5 w-full"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        onBlur={() => {
+                          setCompanyData(p => ({ ...p, [fieldKey]: editValue }))
+                          setEditingField(null)
+                          showToast(`${row.label} u përditësua ✓`)
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            setCompanyData(p => ({ ...p, [fieldKey]: editValue }))
+                            setEditingField(null)
+                            showToast(`${row.label} u përditësua ✓`)
+                          }
+                        }}
+                      />
+                    ) : (
+                      <p className="text-xs text-gray-400 mt-0.5">{companyData[fieldKey] || row.sub}</p>
+                    )}
                   </div>
                   {row.key ? (
                     <Toggle on={toggles[row.key]} onToggle={() => tog(row.key)}/>
                   ) : isLockedSection && !isAdmin ? (
                     <button className="btn btn-outline btn-sm text-xs opacity-50 cursor-not-allowed" disabled>Nuk mund të ndryshohet</button>
                   ) : (
-                    <button className="btn btn-outline btn-sm text-xs">Ndrysho</button>
+                    <button
+                      className="btn btn-outline btn-sm text-xs"
+                      onClick={() => {
+                        setEditingField(`${title}-${i}`)
+                        setEditValue(companyData[fieldKey] || row.sub)
+                      }}
+                    >
+                      {isEditing ? 'Duke redaktuar...' : 'Ndrysho'}
+                    </button>
                   )}
                 </div>
-              ))}
+              )
+              })}
             </div>
           </div>
         )
