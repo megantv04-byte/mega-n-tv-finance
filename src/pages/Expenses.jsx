@@ -7,7 +7,7 @@ import { useApp } from '../context/AppContext'
 import { useFeatures } from '../features/useFeatures'
 import { EmptyState, Modal, FormGroup, Pagination } from '../components/UI'
 import FormPageWrapper from '../components/FormPageWrapper'
-import { expenseTypes, depositedToOptions } from '../data/mockData'
+import { expenseTypes, depositedToOptions, mockVendors } from '../data/mockData'
 import ImportExcelModal, { downloadTemplate } from '../components/ImportExcelModal'
 
 // sort/page defaults
@@ -128,20 +128,21 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
 
       {/* Furnitori */}
       <FormGroup label="Furnitori">
-        <input className="form-control" value={form.vendor}
-          onChange={e => set('vendor', e.target.value)}
-          placeholder="Emri i furnitorit / kompanisë..." />
+        <select className="form-control" value={form.vendor}
+          onChange={e => set('vendor', e.target.value)}>
+          <option value="">Zgjidh furnitorin...</option>
+          {mockVendors.map(v => <option key={v.id} value={v.name}>{v.name}</option>)}
+        </select>
       </FormGroup>
 
       {/* Nga cila llogari - Only for organizations with partner expense feature enabled */}
       {canUsePartnerExpenseFields && (
         <FormGroup label="Nga cila llogari u pagua">
-          <SlideSelect
-            value={form.paidFrom}
-            onChange={v => set('paidFrom', v)}
-            options={depositAccounts}
-            placeholder="Zgjidh llogarinë nga e cila u pagua..."
-          />
+          <select className="form-control" value={form.paidFrom}
+            onChange={e => set('paidFrom', e.target.value)}>
+            <option value="">Zgjidh llogarinë...</option>
+            {depositAccounts.map(acc => <option key={acc} value={acc}>{acc}</option>)}
+          </select>
         </FormGroup>
       )}
 
