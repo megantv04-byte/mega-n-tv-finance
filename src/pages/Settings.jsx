@@ -9,14 +9,17 @@ export default function Settings() {
   const fileInputRef = useRef(null)
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
-  const [companyData, setCompanyData] = useState({
-    companyName: 'XFlow Studio',
-    email: 'info@xflow.ks',
-    phone: '+383 44 100 200',
-    address: 'Rruga Nënë Tereza 12, Prishtinë',
-    language: 'Shqip (Kosovë)',
-    dateFormat: 'DD/MM/YYYY',
-    timezone: 'UTC+1 (CET)',
+  const [companyData, setCompanyData] = useState(() => {
+    const saved = localStorage.getItem('xflow_company_data')
+    return saved ? JSON.parse(saved) : {
+      companyName: 'XFlow Studio',
+      email: 'info@xflow.ks',
+      phone: '+383 44 100 200',
+      address: 'Rruga Nënë Tereza 12, Prishtinë',
+      language: 'Shqip (Kosovë)',
+      dateFormat: 'DD/MM/YYYY',
+      timezone: 'UTC+1 (CET)',
+    }
   })
   const [toggles, setToggles] = useState({
     emailNotif: true, smsNotif: false, autoInvoice: true,
@@ -39,6 +42,11 @@ export default function Settings() {
     const backups = BackupService.getAutoBackups()
     setAutoBackups(backups)
   }, [])
+
+  // Save company data to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('xflow_company_data', JSON.stringify(companyData))
+  }, [companyData])
 
   const handleSaveAdvanceDays = () => {
     if (advanceDays < 0 || advanceDays > 90) {
