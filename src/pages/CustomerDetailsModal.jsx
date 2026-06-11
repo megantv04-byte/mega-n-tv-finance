@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { X, Pencil, Save, XCircle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { countries } from '../data/mockData'
 
 export default function CustomerDetailsModal({ customer, onClose }) {
-  const { customers, setCustomers, showToast, invoices, payments } = useApp()
+  const { customers, setCustomers, showToast, invoices, payments, logActivity } = useApp()
   const [isEditing, setIsEditing] = useState(false)
 
   // Calculate customer stats
@@ -19,6 +20,8 @@ export default function CustomerDetailsModal({ customer, onClose }) {
     phone: customer?.phone || '',
     country: customer?.country || '',
     type: customer?.type || 'individual',
+    app: customer?.app || '',
+    macId: customer?.macId || '',
   })
   const [errors, setErrors] = useState({})
 
@@ -52,11 +55,14 @@ export default function CustomerDetailsModal({ customer, onClose }) {
             phone: formData.phone,
             country: formData.country,
             type: formData.type,
+            app: formData.app,
+            macId: formData.macId,
           }
         : c
     )
 
     setCustomers(updatedCustomers)
+    logActivity(`Përditësoi klientin ${formData.name}`, 'Klientët')
     showToast(`✓ ${formData.name} u përditësua!`)
     setIsEditing(false)
   }
@@ -153,13 +159,14 @@ export default function CustomerDetailsModal({ customer, onClose }) {
               🌍 Vendi
             </label>
             {isEditing ? (
-              <input
-                type="text"
+              <select
                 value={formData.country}
                 onChange={e => handleChange('country', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
-                placeholder="Shqipëri"
-              />
+              >
+                <option value="">— Zgjidh vendin —</option>
+                {countries.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             ) : (
               <p className="text-gray-600 dark:text-gray-400">{customer?.country || '—'}</p>
             )}
@@ -187,6 +194,42 @@ export default function CustomerDetailsModal({ customer, onClose }) {
               }`}>
                 {customer?.type === 'reseller' ? '🔄 Reseller' : '👤 Individ'}
               </span>
+            )}
+          </div>
+
+          {/* App */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              Aplikacioni
+            </label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.app}
+                onChange={e => handleChange('app', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                placeholder="p.sh. ipos, maniak"
+              />
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">{customer?.app || '—'}</p>
+            )}
+          </div>
+
+          {/* MAC ID */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              MAC ID
+            </label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.macId}
+                onChange={e => handleChange('macId', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                placeholder="00:1A:2B:3C:4D:5E"
+              />
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">{customer?.macId || '—'}</p>
             )}
           </div>
 
