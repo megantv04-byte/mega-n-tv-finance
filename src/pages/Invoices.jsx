@@ -95,7 +95,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
     customers,
     payments, setPayments,
     setModal, closeModal,
-    showToast, fmt,
+    showToast, fmt, logActivity,
   } = useApp()
 
   const inv = invoices.find(i => i.id === invId)
@@ -125,6 +125,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
   }
   const doDelete = () => {
     setInvoices(prev => prev.filter(i => i.id !== inv.id))
+    logActivity(`Fshiu faturën ${inv.id} — ${inv.customer} €${inv.amount}`, 'Faturat')
     showToast('Fatura u fshi')
     onClose()
   }
@@ -1465,6 +1466,7 @@ export default function Invoices() {
                                     onClick={e => {
                                       e.stopPropagation()
                                       setInvoices(p => p.filter(i => i.id !== inv.id))
+                                      logActivity(`Fshiu faturën ${inv.id} — ${inv.customer} €${inv.amount}`, 'Faturat')
                                       showToast('Fatura u fshi')
                                       setOpenDropdown(null)
                                     }}
