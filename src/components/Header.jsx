@@ -20,11 +20,12 @@ const PAGE_TITLES = {
 export default function Header() {
   const {
     page, currency, setCurrency, darkMode, setDarkMode,
-    setSidebarOpen, invoices, navigate, currentUser,
+    setSidebarOpen, invoices, customers, navigate, currentUser,
   } = useApp()
   const [curOpen, setCurOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
   const [readNotifications, setReadNotifications] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('xflow_read_notifications') || '{}')
@@ -33,6 +34,25 @@ export default function Header() {
     }
   })
   const notifRef = useRef(null)
+
+  // Handle search - filter invoices by customer name
+  const handleSearch = (value) => {
+    setSearchInput(value)
+    if (value.trim()) {
+      // Find customer with matching name (case-insensitive)
+      const customer = customers.find(c => c.name.toLowerCase().includes(value.toLowerCase()))
+      if (customer) {
+        // Navigate to invoices with customer filter in URL
+        localStorage.setItem('xflow_invoice_search', customer.name)
+        navigate('invoices')
+      }
+    }
+  }
+
+  const handleSearchClear = () => {
+    setSearchInput('')
+    localStorage.removeItem('xflow_invoice_search')
+  }
 
   // Persist read notifications to localStorage
   useEffect(() => {
@@ -85,7 +105,25 @@ export default function Header() {
       {/* Search - hidden on mobile */}
       <div className="hidden lg:flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 w-48 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all flex-shrink-0">
         <Search size={14} className="text-gray-400 flex-shrink-0" />
-        <input className="bg-transparent border-none outline-none text-sm text-gray-600 dark:text-gray-300 w-full placeholder-gray-400" placeholder="Kërko..." />
+        <input
+          className="bg-transparent border-none outline-none text-sm text-gray-600 dark:text-gray-300 w-full placeholder-gray-400"
+          placeholder="Emri i klientit..."
+          value={searchInput}
+          onChange={(e) => handleSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch(searchInput)
+            }
+          }}
+        />
+        {searchInput && (
+          <button
+            onClick={handleSearchClear}
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Quick Add Button - Context Aware */}

@@ -707,7 +707,12 @@ export default function Invoices() {
     </div>
   ) : null
 
-  const [search,       setSearch]   = useState('')
+  const [search,       setSearch]   = useState(() => {
+    // Load search from header if user searched by customer name
+    const headerSearch = localStorage.getItem('xflow_invoice_search')
+    localStorage.removeItem('xflow_invoice_search') // Clear it after reading
+    return headerSearch || ''
+  })
   const [statusFilter, setStatus]   = useState('all')
   const [typeFilter,   setTypeFilter]= useState('all')   // 'all' | 'reseller' | 'individual'
   const [paginationPage,  setPaginationPage] = useState(1)
