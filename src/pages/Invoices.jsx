@@ -1277,7 +1277,7 @@ export default function Invoices() {
           <option value="reseller">🔄 Reseller</option>
         </select>
         <select
-          className="bg-white border border-gray-200 rounded-lg px-2.5 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+          className="hidden sm:block bg-white border border-gray-200 rounded-lg px-2.5 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={perPage}
           onChange={e => { setPerPage(Number(e.target.value)); setPaginationPage(1) }}
         >
@@ -1386,6 +1386,13 @@ export default function Invoices() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Mobile pagination - hidden on sm+ */}
+      {paged.length > 0 && (
+        <div className="sm:hidden mb-6">
+          <Pagination page={paginationPage} total={filtered.length} perPage={perPage} onChange={setPaginationPage}/>
         </div>
       )}
 

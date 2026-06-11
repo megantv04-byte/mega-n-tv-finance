@@ -536,7 +536,7 @@ export default function ExpensesPage() {
           <option value="once">Vetëm njëherësh</option>
         </select>
 
-        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+        <select className="hidden sm:block bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={perPage} onChange={e => { setPerPage(Number(e.target.value)); setPg(1) }}>
           <option value={25}>25 / faqe</option>
           <option value={50}>50 / faqe</option>

@@ -323,7 +323,7 @@ export default function Payments() {
         </select>
 
         <select
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+          className="hidden sm:block bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={perPage}
           onChange={e => { setPerPage(Number(e.target.value)); setPg(1) }}
         >

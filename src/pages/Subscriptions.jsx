@@ -179,6 +179,7 @@ const Section = memo(function Section({ title, color, items, today, sentIds, ite
       {paginatedItems.length > 0 && (
         <div className="sm:hidden space-y-2 mb-4">
           {paginatedItems.map(inv => {
+            const [openDropdown, setOpenDropdown] = useState(null)
             const phone = getPhone(inv.customer)
             const msg = encodeURIComponent(`Përshëndetje!\nAbonimit juaj skadon më ${inv.subscriptionExpiry}.\nJu lutem, rinovoni për të vazhduar shërbimin.\nFaleminderit!`)
             const daysLeft = inv.notifyDate
@@ -201,28 +202,38 @@ const Section = memo(function Section({ title, color, items, today, sentIds, ite
                     <p className="text-xs text-gray-500 mt-0.5">{inv.type || inv.product || '—'}</p>
                   </div>
 
-                  {/* Col 3: Contact */}
-                  <div className="relative flex-shrink-0 flex gap-1">
-                    {phone ? (
-                      <>
+                  {/* Col 3: Contact - Dropdown */}
+                  <div className="relative flex-shrink-0">
+                    <button
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all"
+                      onClick={() => setOpenDropdown(openDropdown === inv.id ? null : inv.id)}
+                    >
+                      ⋮
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    {openDropdown === inv.id && phone && (
+                      <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
                         <a
                           href={`https://wa.me/${phone}?text=${msg}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white transition-all"
-                          title="WhatsApp"
+                          className="w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-green-50 flex items-center gap-2 border-b"
+                          onClick={() => setOpenDropdown(null)}
                         >
-                          <MessageCircle size={14}/>
+                          <MessageCircle size={14}/> WhatsApp
                         </a>
                         <a
                           href={`https://t.me/+${phone}`}
                           target="_blank" rel="noopener noreferrer"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-all"
-                          title="Telegram"
+                          className="w-full text-left px-3 py-2 text-sm text-sky-600 hover:bg-sky-50 flex items-center gap-2"
+                          onClick={() => setOpenDropdown(null)}
                         >
-                          <Send size={14}/>
+                          <Send size={14}/> Telegram
                         </a>
-                      </>
-                    ) : (
+                      </div>
+                    )}
+
+                    {!phone && (
                       <span className="text-xs text-gray-300">—</span>
                     )}
                   </div>
