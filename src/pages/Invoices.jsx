@@ -1092,17 +1092,17 @@ export default function Invoices() {
 
         {/* Action buttons */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {/* Export - Icon only */}
+            {/* Export - Icon only - Hidden on mobile */}
             <button
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               title="Eksporto faturat"
             >
               <Download size={16}/>
             </button>
 
-            {/* Import - Icon only */}
+            {/* Import - Icon only - Hidden on mobile */}
             <button
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               onClick={() => setImportOpen(true)}
               title="Importo Excel"
             >
@@ -1120,9 +1120,9 @@ export default function Invoices() {
               </button>
             )}
 
-            {/* New Invoice - Primary button with + icon */}
+            {/* New Invoice - Primary button with + icon - Hidden on mobile (see FAB below) */}
             <button
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
+              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
               onClick={() => navigate('invoices:create')}
               title="Faturë e re"
             >
@@ -1551,6 +1551,15 @@ export default function Invoices() {
 
       {/* Invoice Form Side Panel */}
       {InvoiceFormPanel}
+
+      {/* Floating Action Button - Mobile only */}
+      <div
+        className="fab sm:hidden"
+        onClick={() => navigate('invoices:create')}
+        title="Faturë e re"
+      >
+        <Plus size={28}/>
+      </div>
     </div>
   )
 }

@@ -150,3 +150,23 @@
     padding: 0;
   }
 }
+
+/* Floating Action Button - Mobile only */
+.fab {
+  @apply fixed bottom-6 right-6 w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all duration-200 cursor-pointer z-40 font-bold text-2xl;
+}
+
+.fab:hover {
+  @apply -translate-y-1;
+}
+
+.fab:active {
+  @apply scale-95;
+}
+
+/* Hide on desktop */
+@media (min-width: 640px) {
+  .fab {
+    @apply hidden;
+  }
+}
