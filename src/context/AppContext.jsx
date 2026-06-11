@@ -326,9 +326,11 @@ export function AppProvider({ children }) {
           supabase.from('users').upsert(toSeed.map(u => ({ id: u.id, data: u }))).then()
       }
 
-      // Activities — load from Supabase
+      // Activities — load from Supabase and filter by current org
       {
-        const loadedActivities = act?.data?.length ? fromRows(act.data) : []
+        const allActivities = act?.data?.length ? fromRows(act.data) : []
+        // Filter activities to only show those from current organization
+        const loadedActivities = currentOrgId ? allActivities.filter(a => a.orgId === currentOrgId) : []
         setActivityLog(loadedActivities)
         prevActivities.current = loadedActivities
       }
@@ -391,7 +393,7 @@ export function AppProvider({ children }) {
     if (canSync && supabase) {
       diffSync('activities', activityLog, prevActivities, currentOrgId)
     }
-  }, [activityLog, canSync])
+  }, [activityLog, canSync, currentOrgId])
 
   useEffect(() => {
     if (!canSync || !supabase) return
@@ -577,8 +579,9 @@ export function AppProvider({ children }) {
       action,
       module,
       timestamp: new Date().toISOString(),
+      orgId:     currentOrgId,
     }, ...prev])
-  }, [currentUser])
+  }, [currentUser, currentOrgId])
 
   /* ── Helpers ── */
   const showToast = useCallback((msg, type = 'success') => {
