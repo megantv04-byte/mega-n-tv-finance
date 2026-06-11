@@ -1288,8 +1288,109 @@ export default function Invoices() {
         </select>
       </div>
 
-      {/* Table */}
-      <div className="card">
+      {/* Mobile Card View - Hidden on sm+ */}
+      {paged.length > 0 && (
+        <div className="sm:hidden space-y-2 mb-6">
+          {paged.map(inv => {
+            const rawPhone = cleanPhone(getPhone(inv.customer))
+            const canContact = (inv.status === 'pending' || inv.status === 'overdue') && rawPhone
+            const isOverdue = inv.status === 'overdue' || (inv.due && inv.due < today && inv.status !== 'paid' && inv.status !== 'void')
+
+            return (
+              <div key={inv.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                <div className="flex justify-between items-start gap-2">
+                  {/* Col 1: Customer + Subscription Expiry */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-gray-800 text-sm truncate">{inv.customer}</p>
+                    <p className="text-xs font-bold text-blue-600 mt-0.5">
+                      {inv.subscriptionExpiry || '—'}
+                    </p>
+                  </div>
+
+                  {/* Col 2: Amount + Status */}
+                  <div className="text-right">
+                    <p className="font-bold text-gray-800 text-sm">{fmt(inv.amount)}</p>
+                    <div className="mt-0.5">
+                      <StatusBadge status={isOverdue && inv.status !== 'paid' && inv.status !== 'void' ? 'overdue' : inv.status}/>
+                    </div>
+                  </div>
+
+                  {/* Col 3: Actions - Larger Button */}
+                  <div className="relative flex-shrink-0">
+                    <button
+                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all duration-150"
+                      onClick={e => {
+                        e.stopPropagation()
+                        setOpenDropdown(openDropdown === inv.id ? null : inv.id)
+                      }}
+                    >
+                      <MoreVertical size={18}/>
+                    </button>
+
+                    {/* Dropdown */}
+                    {openDropdown === inv.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b"
+                          onClick={e => {
+                            e.stopPropagation()
+                            navigate(`invoices:${inv.id}:edit`)
+                            setOpenDropdown(null)
+                          }}
+                        >
+                          <Pencil size={14}/> Ndrysho
+                        </button>
+
+                        {canContact && (
+                          <a
+                            href={`https://wa.me/${rawPhone}?text=${encodeURIComponent(buildReminderMsg(inv))}`}
+                            target="_blank" rel="noopener noreferrer"
+                            className={`block w-full text-left px-3 py-2 text-sm hover:bg-green-50 flex items-center gap-2 border-b ${isOverdue ? 'text-orange-600' : 'text-green-600'}`}
+                            onClick={e => {
+                              e.stopPropagation()
+                              MessageLogService.logWhatsAppMessage(inv.customer, rawPhone, buildReminderMsg(inv), inv.id, 'prepared')
+                              setOpenDropdown(null)
+                            }}
+                          >
+                            <MessageCircle size={14}/> Pagesa WA {isOverdue && '🔔'}
+                          </a>
+                        )}
+
+                        {(inv.status === 'pending' || inv.status === 'overdue') && (
+                          <button
+                            className="w-full text-left px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 border-b"
+                            onClick={e => {
+                              e.stopPropagation()
+                              setModal(<PaymentModal invoice={inv} onClose={closeModal}/>)
+                              setOpenDropdown(null)
+                            }}
+                          >
+                            <CreditCard size={14}/> Pagesa
+                          </button>
+                        )}
+
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          onClick={e => {
+                            e.stopPropagation()
+                            setDeletingInvoiceId(inv.id)
+                            setOpenDropdown(null)
+                          }}
+                        >
+                          <Trash2 size={14}/> Fshi
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Table - Hidden on Mobile */}
+      <div className="card hidden sm:block">
         {paged.length === 0 ? (
           <EmptyState
             icon={FileText}
