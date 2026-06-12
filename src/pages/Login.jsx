@@ -45,7 +45,7 @@ export default function Login({ users = [], onLogin }) {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center text-white shadow-md">
+          <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center text-white shadow-md">
             <Zap size={20} strokeWidth={2.5} />
           </div>
           <div>

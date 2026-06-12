@@ -52,7 +52,7 @@ function InvoiceListCard({ inv, selected, onClick }) {
     const paidFormatted = Math.round(paid * 100) / 100
     const remainingFormatted = Math.round(remaining * 100) / 100
     dueLabel = `€${paidFormatted} / €${remainingFormatted}`
-    dueCls = 'text-blue-600 font-semibold'
+    dueCls = 'text-red-500 font-semibold'
   }
   else if (inv.status === 'void')  { dueLabel = 'VOID';           dueCls = 'text-gray-400 line-through' }
   else if (inv.status === 'draft') { dueLabel = 'DRAFT';          dueCls = 'text-gray-400' }
@@ -66,7 +66,7 @@ function InvoiceListCard({ inv, selected, onClick }) {
     <div
       className={`px-4 py-3 cursor-pointer border-b border-gray-100 transition-all ${
         selected
-          ? 'bg-blue-50 border-l-[3px] border-l-blue-500'
+          ? 'bg-red-50 border-l-[3px] border-l-red-500'
           : 'hover:bg-gray-50 border-l-[3px] border-l-transparent'
       }`}
       onClick={onClick}
@@ -172,7 +172,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
       {/* ── Action toolbar ── */}
       <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-gray-100 bg-white flex-wrap">
         {/* Mobile back button */}
-        <button className="md:hidden icon-btn mr-1 text-blue-600" onClick={onClose} title="Kthehu">
+        <button className="md:hidden icon-btn mr-1 text-red-500" onClick={onClose} title="Kthehu">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </button>
         <div className="flex items-center gap-2 mr-1">
@@ -189,7 +189,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
 
         {inv.status === 'draft' && (
           <button
-            className={`${TB} border-blue-200 text-blue-600 hover:bg-blue-50`}
+            className={`${TB} border-blue-200 text-red-500 hover:bg-red-50`}
             onClick={() => {
               setInvoices(prev => prev.map(i => i.id === inv.id ? { ...i, status: 'pending' } : i))
               showToast('Fatura kaloi në pritje ✓')
@@ -291,7 +291,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
               )}
             </div>
             <div className="text-right">
-              <h2 className="text-2xl font-light tracking-[0.22em] text-blue-700 uppercase">Faturë</h2>
+              <h2 className="text-2xl font-light tracking-[0.22em] text-red-600 uppercase">Faturë</h2>
               <p className="text-xs font-bold text-gray-500 mt-0.5">Numri i faturës {inv.id}</p>
             </div>
           </div>
@@ -301,7 +301,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
               <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1.5">Fatura për</p>
               <button
                 onClick={() => setSelectedCustomer(custObj)}
-                className="font-bold text-blue-700 text-base leading-tight hover:text-blue-900 hover:underline cursor-pointer transition-colors text-left"
+                className="font-bold text-red-600 text-base leading-tight hover:text-red-800 hover:underline cursor-pointer transition-colors text-left"
               >
                 {inv.customer}
               </button>
@@ -315,10 +315,10 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
 
               {/* Shfaq shumin e paguar dhe balancën për faturat e paguara pjesërisht */}
               {inv.status === 'partial' && inv.paidAmount > 0 && (
-                <div className="mb-3 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="mb-3 p-2 bg-red-50 rounded-lg border border-red-100">
                   <div className="flex items-center justify-between sm:justify-end gap-4 text-xs mb-1.5">
-                    <span className="text-blue-600 font-semibold">Paguar:</span>
-                    <span className="font-bold text-blue-700 w-24 text-right">{fmt(inv.paidAmount)}</span>
+                    <span className="text-red-500 font-semibold">Paguar:</span>
+                    <span className="font-bold text-red-600 w-24 text-right">{fmt(inv.paidAmount)}</span>
                   </div>
                   <div className="flex items-center justify-between sm:justify-end gap-4 text-xs">
                     <span className="text-amber-600 font-semibold">Mbetur:</span>
@@ -327,7 +327,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
                   {/* Indikatori i progresit */}
                   <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-500 h-2 rounded-full transition-all"
+                      className="bg-red-500 h-2 rounded-full transition-all"
                       style={{ width: `${(inv.paidAmount / inv.amount) * 100}%` }}
                     ></div>
                   </div>
@@ -348,7 +348,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
                 {inv.subscriptionExpiry && (
                   <div className="flex items-center justify-between sm:justify-end gap-4">
                     <span className="text-gray-400">Skadimi:</span>
-                    <span className="font-medium text-blue-700 w-24 text-right">{formatDate(inv.subscriptionExpiry)}</span>
+                    <span className="font-medium text-red-600 w-24 text-right">{formatDate(inv.subscriptionExpiry)}</span>
                   </div>
                 )}
                 {inv.notifyDate && (
@@ -367,7 +367,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
           <div className="px-6 pb-4 overflow-x-auto">
             <table className="w-full text-xs border-collapse min-w-[380px]">
               <thead>
-                <tr className="bg-blue-600 text-white">
+                <tr className="bg-red-500 text-white">
                   <th className="text-center px-3 py-2.5 rounded-tl-lg w-8">#</th>
                   <th className="text-left px-3 py-2.5">Artikulli &amp; Përshkrimi</th>
                   <th className="text-right px-3 py-2.5 w-14">Sasia</th>
@@ -392,14 +392,14 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
             </table>
             <div className="flex justify-end mt-3 pt-3 border-t-2 border-blue-200">
               <div className="flex items-center gap-10 text-sm">
-                <span className="font-bold text-blue-700">Totali</span>
+                <span className="font-bold text-red-600">Totali</span>
                 <span className="font-bold text-gray-800 text-base">{fmt(inv.amount)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-blue-50 px-6 py-3 text-center">
-            <p className="text-xs text-blue-500 font-medium">Faleminderit për besimin tuaj!</p>
+          <div className="bg-red-50 px-6 py-3 text-center">
+            <p className="text-xs text-red-500 font-medium">Faleminderit për besimin tuaj!</p>
           </div>
         </div>
 
@@ -411,7 +411,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
               </p>
               <div className="flex items-center gap-1">
                 <button
-                  className="icon-btn text-blue-400 hover:bg-blue-50"
+                  className="icon-btn text-red-400 hover:bg-red-50"
                   title="Ndrysho pagesën"
                   onClick={() => setModal(<PaymentModal payment={linkedPayment} onClose={closeModal}/>)}
                 >
@@ -439,7 +439,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
               <div><p className="text-gray-400 mb-0.5">Metoda</p><p className="font-semibold text-gray-700">{linkedPayment.method}</p></div>
               <div>
                 <p className="text-gray-400 mb-0.5">Tek</p>
-                <p className={`font-bold ${linkedPayment.depositedTo === 'Enndy' ? 'text-blue-600' : 'text-purple-600'}`}>
+                <p className={`font-bold ${linkedPayment.depositedTo === 'Enndy' ? 'text-red-500' : 'text-purple-600'}`}>
                   {linkedPayment.depositedTo}
                 </p>
               </div>
@@ -462,7 +462,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
             <div className="space-y-2.5 mb-3">
               {(inv.comments || []).map((c, i) => (
                 <div key={i} className="flex gap-2">
-                  <div className="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center text-xs font-bold text-blue-600 flex-shrink-0 mt-0.5">
+                  <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center text-xs font-bold text-red-500 flex-shrink-0 mt-0.5">
                     {c.author[0]}
                   </div>
                   <div className="flex-1 bg-gray-50 rounded-xl px-3 py-2">
@@ -548,7 +548,7 @@ function KanbanCard({ inv, onOpen }) {
 
       {/* Subscription expiry */}
       {inv.subscriptionExpiry && (
-        <div className="text-[11px] text-blue-500 mb-3 flex items-center gap-1">
+        <div className="text-[11px] text-red-500 mb-3 flex items-center gap-1">
           <span>🔄</span>
           <span>Abonim deri: {formatDate(inv.subscriptionExpiry)}</span>
         </div>
@@ -899,7 +899,7 @@ export default function Invoices() {
 
           <div className="px-3 py-2 border-b border-gray-100">
             <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5
-                            focus-within:border-blue-400 focus-within:bg-white transition-all">
+                            focus-within:border-red-400 focus-within:bg-white transition-all">
               <Search size={12} className="text-gray-400 flex-shrink-0"/>
               <input
                 className="bg-transparent border-none outline-none text-xs text-gray-600 w-full placeholder-gray-400"
@@ -925,7 +925,7 @@ export default function Invoices() {
                 onClick={() => setStatus(f.key)}
                 className={`flex-shrink-0 text-xs px-2.5 py-1 rounded-full transition-colors ${
                   statusFilter === f.key
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-red-500 text-white'
                     : 'text-gray-500 hover:bg-gray-100'
                 }`}
               >
@@ -1021,7 +1021,7 @@ export default function Invoices() {
 
             {/* New Invoice */}
             <button
-              className="w-9 h-9 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-bold text-lg"
               onClick={() => navigate('invoices:create')}
               title="Faturë e re"
             >
@@ -1086,9 +1086,9 @@ export default function Invoices() {
               <p className="text-xs text-red-600 font-medium">Të vonuara</p>
               <p className="text-base font-bold text-red-700">{fmt(overdueValue)}</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-3 border border-blue-100 min-w-max">
-              <p className="text-xs text-blue-600 font-medium">Papaguara Sellers</p>
-              <p className="text-base font-bold text-blue-700">{fmt(totalUnpaidSellers)}</p>
+            <div className="bg-red-50 rounded-lg p-3 border border-red-100 min-w-max">
+              <p className="text-xs text-red-500 font-medium">Papaguara Sellers</p>
+              <p className="text-base font-bold text-red-600">{fmt(totalUnpaidSellers)}</p>
             </div>
           </div>
 
@@ -1124,7 +1124,7 @@ export default function Invoices() {
 
             {/* New Invoice - Primary button with + icon - Hidden on mobile (see FAB below) */}
             <button
-              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
+              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-bold text-lg"
               onClick={() => navigate('invoices:create')}
               title="Faturë e re"
             >
@@ -1143,9 +1143,9 @@ export default function Invoices() {
             <p className="text-xs text-red-600 font-medium">Të vonuara</p>
             <p className="text-base font-bold text-red-700">{fmt(overdueValue)}</p>
           </div>
-          <div className="flex-1 bg-blue-50 rounded-lg p-3 border border-blue-100">
-            <p className="text-xs text-blue-600 font-medium">Papaguara Sellers</p>
-            <p className="text-base font-bold text-blue-700">{fmt(totalUnpaidSellers)}</p>
+          <div className="flex-1 bg-red-50 rounded-lg p-3 border border-red-100">
+            <p className="text-xs text-red-500 font-medium">Papaguara Sellers</p>
+            <p className="text-base font-bold text-red-600">{fmt(totalUnpaidSellers)}</p>
           </div>
         </div>
       </div>
@@ -1247,7 +1247,7 @@ export default function Invoices() {
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2
-                        focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all flex-1 min-w-[160px]">
+                        focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-50 transition-all flex-1 min-w-[160px]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
@@ -1259,7 +1259,7 @@ export default function Invoices() {
           />
         </div>
         <select
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={statusFilter}
           onChange={e => { setStatus(e.target.value); setPaginationPage(1) }}
         >
@@ -1272,7 +1272,7 @@ export default function Invoices() {
         </select>
 
         <select
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={typeFilter}
           onChange={e => { setTypeFilter(e.target.value); setPaginationPage(1) }}
         >
@@ -1281,7 +1281,7 @@ export default function Invoices() {
           <option value="reseller">🔄 Reseller</option>
         </select>
         <select
-          className="hidden sm:block bg-white border border-gray-200 rounded-lg px-2.5 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+          className="hidden sm:block bg-white border border-gray-200 rounded-lg px-2.5 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={perPage}
           onChange={e => { setPerPage(Number(e.target.value)); setPaginationPage(1) }}
         >
@@ -1305,8 +1305,8 @@ export default function Invoices() {
                 <div className="flex justify-between items-start gap-2">
                   {/* Col 1: Customer + Subscription Expiry */}
                   <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setPreview(inv.id)}>
-                    <p className="font-bold text-gray-800 text-sm truncate hover:text-blue-600 transition-colors">{inv.customer}</p>
-                    <p className="text-xs font-bold text-blue-600 mt-0.5">
+                    <p className="font-bold text-gray-800 text-sm truncate hover:text-red-500 transition-colors">{inv.customer}</p>
+                    <p className="text-xs font-bold text-red-500 mt-0.5">
 {formatDate(inv.subscriptionExpiry)}
                     </p>
                   </div>
@@ -1322,7 +1322,7 @@ export default function Invoices() {
                   {/* Col 3: Actions - Larger Button */}
                   <div className="relative flex-shrink-0">
                     <button
-                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all duration-150"
+                      className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white transition-all duration-150"
                       onClick={e => {
                         e.stopPropagation()
                         setOpenDropdown(openDropdown === inv.id ? null : inv.id)
@@ -1335,7 +1335,7 @@ export default function Invoices() {
                     {openDropdown === inv.id && (
                       <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
                         <button
-                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b"
+                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-red-50 flex items-center gap-2 border-b"
                           onClick={e => {
                             e.stopPropagation()
                             navigate(`invoices:${inv.id}:edit`)
@@ -1421,7 +1421,7 @@ export default function Invoices() {
                       { key: 'customer', label: 'Klienti',cls: '' },
                       { key: 'referent', label: 'Referenti', cls: 'hidden sm:table-cell' },
                     ].map(col => (
-                      <th key={col.key} className={`table-th cursor-pointer select-none hover:text-blue-600 ${col.cls}`}
+                      <th key={col.key} className={`table-th cursor-pointer select-none hover:text-red-500 ${col.cls}`}
                           onClick={() => toggleSort(col.key)}>
                         <span className="flex items-center gap-1">
                           {col.label}
@@ -1430,7 +1430,7 @@ export default function Invoices() {
                       </th>
                     ))}
                     <th className="table-th sm:table-cell lg:table-cell">Skadimi Abonimit</th>
-                    <th className="table-th cursor-pointer select-none hover:text-blue-600"
+                    <th className="table-th cursor-pointer select-none hover:text-red-500"
                         onClick={() => toggleSort('amount')}>
                       <span className="flex items-center gap-1">
                         Shuma
@@ -1438,7 +1438,7 @@ export default function Invoices() {
                       </span>
                     </th>
                     <th className="table-th hidden lg:table-cell">Afati</th>
-                    <th className="table-th cursor-pointer select-none hover:text-blue-600"
+                    <th className="table-th cursor-pointer select-none hover:text-red-500"
                         onClick={() => toggleSort('status')}>
                       <span className="flex items-center gap-1">
                         Statusi
@@ -1469,10 +1469,10 @@ export default function Invoices() {
                     return (
                       <tr
                         key={inv.id}
-                        className={`hover:bg-blue-50/30 transition-colors group ${selected.has(inv.id) ? 'bg-blue-100' : ''}`}
+                        className={`hover:bg-red-50/30 transition-colors group ${selected.has(inv.id) ? 'bg-red-100' : ''}`}
                       >
                         <td className="table-td text-gray-400 hidden sm:table-cell">{formatDate(inv.date)}</td>
-                        <td className="table-td font-bold text-blue-600 text-sm hidden sm:table-cell cursor-pointer" onClick={() => setPreview(inv.id)}>{inv.id}</td>
+                        <td className="table-td font-bold text-red-500 text-sm hidden sm:table-cell cursor-pointer" onClick={() => setPreview(inv.id)}>{inv.id}</td>
                         <td className="table-td font-medium text-gray-800 cursor-pointer" onClick={() => setPreview(inv.id)}>
                           <div className="flex items-center gap-1.5">
                             {inv.customer}
@@ -1486,16 +1486,16 @@ export default function Invoices() {
                         </td>
                         <td className="table-td text-gray-600 hidden sm:table-cell text-sm">
                           {inv.referent ? (
-                            <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                            <span className="px-2 py-1 bg-red-50 text-red-600 rounded-full text-xs font-medium">
                               {inv.referent}
                             </span>
                           ) : (
                             <span className="text-gray-300 italic text-xs">-</span>
                           )}
                         </td>
-                        <td className="table-td text-blue-600 sm:table-cell lg:table-cell text-sm font-medium">
+                        <td className="table-td text-red-500 sm:table-cell lg:table-cell text-sm font-medium">
                           {inv.subscriptionExpiry ? (
-                            <span className="px-2 py-1 bg-blue-50 rounded-full text-xs">
+                            <span className="px-2 py-1 bg-red-50 rounded-full text-xs">
                               {formatDate(inv.subscriptionExpiry)}
                             </span>
                           ) : (
@@ -1534,7 +1534,7 @@ export default function Invoices() {
                                   }}
                                 >
                                   <button
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 flex items-center gap-2 border-b border-gray-100"
                                     onClick={e => {
                                       e.stopPropagation()
                                       navigate(`invoices:${inv.id}:edit`)
@@ -1586,7 +1586,7 @@ export default function Invoices() {
                                     <a
                                       href={`https://wa.me/${rawPhone}?text=${encodeURIComponent(buildInvoiceMsg(inv))}`}
                                       target="_blank" rel="noopener noreferrer"
-                                      className="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100"
+                                      className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2 border-b border-gray-100"
                                       onClick={e => {
                                         e.stopPropagation()
                                         // Log as "prepared" when button is clicked

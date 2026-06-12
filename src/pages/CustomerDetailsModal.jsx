@@ -190,7 +190,7 @@ export default function CustomerDetailsModal({ customer, onClose }) {
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                 customer?.type === 'reseller'
                   ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                  : 'bg-red-100 dark:bg-red-800/30 text-red-600 dark:text-red-300'
               }`}>
                 {customer?.type === 'reseller' ? '🔄 Reseller' : '👤 Individ'}
               </span>
@@ -238,8 +238,8 @@ export default function CustomerDetailsModal({ customer, onClose }) {
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Statistika</p>
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{subscriptionCount}</p>
+                <div className="bg-red-50 dark:bg-red-800/20 rounded-lg p-3 text-center">
+                  <p className="text-2xl font-bold text-red-500 dark:text-red-400">{subscriptionCount}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Abonime</p>
                 </div>
                 <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 text-center">
@@ -278,7 +278,7 @@ export default function CustomerDetailsModal({ customer, onClose }) {
               </button>
               <button
                 onClick={handleSave}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors font-semibold"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors font-semibold"
               >
                 <Save size={16} />
                 Ruaj
@@ -287,7 +287,7 @@ export default function CustomerDetailsModal({ customer, onClose }) {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors font-semibold"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors font-semibold"
             >
               <Pencil size={16} />
               Ndrysho

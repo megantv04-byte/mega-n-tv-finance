@@ -54,7 +54,7 @@ export default function Sidebar() {
       `}>
         {/* Logo */}
         <div className={`flex items-center border-b border-gray-100 dark:border-gray-800 h-12 sm:h-14 flex-shrink-0 ${sidebarCollapsed ? 'justify-center px-2' : 'gap-2 sm:gap-3 px-3 sm:px-4'}`}>
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-sm">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-sm">
             <Zap size={14} strokeWidth={2.5} />
           </div>
           {!sidebarCollapsed && (
@@ -164,7 +164,7 @@ export default function Sidebar() {
 
         {/* Collapse toggle — visible only on desktop */}
         <button
-          className="hidden lg:flex items-center justify-center h-10 border-t border-gray-100 dark:border-gray-800 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 transition-colors flex-shrink-0"
+          className="hidden lg:flex items-center justify-center h-10 border-t border-gray-100 dark:border-gray-800 text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-500 transition-colors flex-shrink-0"
           onClick={() => setSidebarCollapsed(v => !v)}
           title={sidebarCollapsed ? 'Zgjero menunë' : 'Minimizo menunë'}
         >

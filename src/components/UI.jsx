@@ -113,7 +113,7 @@ export function Pagination({ page, total, perPage, onChange }) {
 
   const btn = active =>
     `min-w-[2rem] h-8 px-2 flex items-center justify-center rounded-lg text-sm font-medium transition-all ${
-      active ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+      active ? 'bg-red-500 text-white' : 'text-gray-500 hover:bg-gray-100'
     }`
 
   return (
@@ -138,7 +138,7 @@ export function Pagination({ page, total, perPage, onChange }) {
 
 export function Toggle({ on, onToggle }) {
   return (
-    <div className={`toggle ${on ? 'bg-blue-600' : 'bg-gray-200'}`} onClick={onToggle}>
+    <div className={`toggle ${on ? 'bg-red-500' : 'bg-gray-200'}`} onClick={onToggle}>
       <div className={`toggle-knob ${on ? 'translate-x-[18px]' : ''}`} />
     </div>
   )

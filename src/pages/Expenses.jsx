@@ -17,7 +17,7 @@ const ImportExcelModal = lazy(() => import('../components/ImportExcelModal'))
 const FREQ_OPTIONS = ['Mujore', 'Vjetore', 'Ditore']
 
 const FREQ_COLOR = {
-  Mujore:  'bg-blue-50 text-blue-600',
+  Mujore:  'bg-red-50 text-red-500',
   Vjetore: 'bg-purple-50 text-purple-600',
   Ditore:  'bg-amber-50 text-amber-600',
 }
@@ -41,8 +41,8 @@ function SlideSelect({ value, onChange, options, placeholder = 'Zgjidh llogarin�
               onClick={() => onChange(value === opt ? '' : opt)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all whitespace-nowrap ${
                 value === opt
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                  ? 'bg-red-500 text-white border-red-500 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-red-300 hover:text-red-500'
               }`}>
               {opt}
             </button>
@@ -54,7 +54,7 @@ function SlideSelect({ value, onChange, options, placeholder = 'Zgjidh llogarin�
         </button>
       </div>
       {value && (
-        <p className="text-xs text-blue-500 mt-1.5 font-medium">✓ {value}</p>
+        <p className="text-xs text-red-500 mt-1.5 font-medium">✓ {value}</p>
       )}
       {!value && placeholder && (
         <p className="text-xs text-gray-300 mt-1.5">{placeholder}</p>
@@ -166,8 +166,8 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
               <button key={opt} type="button" onClick={() => set('paidBy', opt)}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
                   form.paidBy === opt
-                    ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                    : 'border-gray-200 bg-white text-gray-500 hover:border-blue-300'
+                    ? 'border-red-500 bg-red-500 text-white shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-500 hover:border-red-300'
                 }`}>
                 👤 {opt}
               </button>
@@ -180,7 +180,7 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
       <div className="border border-gray-100 rounded-xl p-4 bg-gray-50/50">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <RefreshCw size={15} className={form.recurring ? 'text-blue-500' : 'text-gray-300'} />
+            <RefreshCw size={15} className={form.recurring ? 'text-red-500' : 'text-gray-300'} />
             <span className="text-sm font-semibold text-gray-700">Shpenzim i përsëritur</span>
             {form.recurring && (
               <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${FREQ_COLOR[form.recurringFreq]}`}>
@@ -190,7 +190,7 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
           </div>
           {/* Toggle */}
           <button type="button" onClick={() => set('recurring', !form.recurring)}
-            className={`relative w-11 h-6 rounded-full transition-colors ${form.recurring ? 'bg-blue-600' : 'bg-gray-200'}`}>
+            className={`relative w-11 h-6 rounded-full transition-colors ${form.recurring ? 'bg-red-500' : 'bg-gray-200'}`}>
             <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
               form.recurring ? 'translate-x-[22px]' : 'translate-x-0.5'
             }`} />
@@ -205,8 +205,8 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
                 <button key={f} type="button" onClick={() => set('recurringFreq', f)}
                   className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${
                     form.recurringFreq === f
-                      ? 'border-blue-600 bg-blue-600 text-white'
-                      : 'border-gray-200 bg-white text-gray-500 hover:border-blue-300'
+                      ? 'border-red-500 bg-red-500 text-white'
+                      : 'border-gray-200 bg-white text-gray-500 hover:border-red-300'
                   }`}>
                   {f === 'Ditore' ? '📅 Ditore' : f === 'Mujore' ? '📆 Mujore' : '🗓 Vjetore'}
                 </button>
@@ -425,7 +425,7 @@ export default function ExpensesPage() {
 
           {/* New Expense - Hidden on mobile (see FAB below) */}
           <button
-            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-bold text-lg"
+            className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-bold text-lg"
             onClick={openAdd}
             title="Shpenzim i ri"
           >
@@ -452,10 +452,10 @@ export default function ExpensesPage() {
         </div>
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
           <div className="flex items-center gap-1.5 mb-1">
-            <Users size={13} className="text-blue-400" />
+            <Users size={13} className="text-red-400" />
             <p className="text-xs text-gray-400 font-medium">Enndy</p>
           </div>
-          <p className="text-xl font-bold text-blue-600">- {fmt(enndiTotal)}</p>
+          <p className="text-xl font-bold text-red-500">- {fmt(enndiTotal)}</p>
           <p className="text-xs text-gray-400 mt-0.5">{Math.round(enndiTotal/allTotal*100)||0}% e totalit</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
@@ -480,15 +480,15 @@ export default function ExpensesPage() {
       {recurringItems.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <RefreshCw size={14} className="text-blue-500" />
+            <RefreshCw size={14} className="text-red-500" />
             <h3 className="text-sm font-bold text-gray-700">Shpenzime të Rregullta</h3>
-            <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-0.5 rounded-full">{recurringItems.length} aktive</span>
+            <span className="bg-red-50 text-red-500 text-xs font-bold px-2 py-0.5 rounded-full">{recurringItems.length} aktive</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {recurringItems.map(e => (
               <div key={e.id} className="bg-white border border-gray-100 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-blue-200 transition-colors">
-                <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <RefreshCw size={15} className="text-blue-400" />
+                <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <RefreshCw size={15} className="text-red-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-800 truncate">{e.type}</p>
@@ -509,7 +509,7 @@ export default function ExpensesPage() {
       {/* Filtrat */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2
-                        focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all flex-1 min-w-[160px]">
+                        focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-50 transition-all flex-1 min-w-[160px]">
           <Search size={14} className="text-gray-400" />
           <input className="bg-transparent border-none outline-none text-sm text-gray-600 w-full placeholder-gray-400"
             placeholder="Kërko shpenzime..."
@@ -521,27 +521,27 @@ export default function ExpensesPage() {
           )}
         </div>
 
-        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={partnerFilt} onChange={e => { setPartner(e.target.value); setPg(1) }}>
           <option value="all">Të dy partnerët</option>
           <option value="Enndy">Enndy</option>
           <option value="Samki">Samki</option>
         </select>
 
-        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer max-w-[200px]"
+        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer max-w-[200px]"
           value={typeFilt} onChange={e => { setType(e.target.value); setPg(1) }}>
           <option value="all">Të gjitha llojet</option>
           {usedTypes.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
 
-        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+        <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={recurFilt} onChange={e => { setRecurFilt(e.target.value); setPg(1) }}>
           <option value="all">Të gjitha</option>
           <option value="recurring">Vetëm të rregullta</option>
           <option value="once">Vetëm njëherësh</option>
         </select>
 
-        <select className="hidden sm:block bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
+        <select className="hidden sm:block bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
           value={perPage} onChange={e => { setPerPage(Number(e.target.value)); setPg(1) }}>
           <option value={25}>25 / faqe</option>
           <option value={50}>50 / faqe</option>
@@ -580,7 +580,7 @@ export default function ExpensesPage() {
                     <p className="font-bold text-red-500 text-sm">- {fmt(e.amount)}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{e.paidFrom || '—'}</p>
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold mt-0.5 ${
-                      e.paidBy === 'Enndy' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                      e.paidBy === 'Enndy' ? 'bg-red-50 text-red-500' : 'bg-purple-50 text-purple-600'
                     }`}>
                       {e.paidBy || '—'}
                     </span>
@@ -589,7 +589,7 @@ export default function ExpensesPage() {
                   {/* Col 3: Actions - Dropdown */}
                   <div className="relative flex-shrink-0">
                     <button
-                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-600 hover:text-white transition-all"
+                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white transition-all"
                       onClick={() => setOpenDropdown(openDropdown === e.id ? null : e.id)}
                     >
                       ⋮
@@ -599,7 +599,7 @@ export default function ExpensesPage() {
                     {openDropdown === e.id && (
                       <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
                         <button
-                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 flex items-center gap-2 border-b"
+                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-red-50 flex items-center gap-2 border-b"
                           onClick={() => {
                             openEdit(e)
                             setOpenDropdown(null)
@@ -647,7 +647,7 @@ export default function ExpensesPage() {
                   { key: 'date',   label: 'Data',     cls: '' },
                   { key: 'type',   label: 'Për çfarë',cls: '' },
                 ].map(col => (
-                  <th key={col.key} className={`table-th cursor-pointer select-none hover:text-blue-600 ${col.cls}`}
+                  <th key={col.key} className={`table-th cursor-pointer select-none hover:text-red-500 ${col.cls}`}
                       onClick={() => toggleSort(col.key)}>
                     <span className="flex items-center gap-1">
                       {col.label}
@@ -655,7 +655,7 @@ export default function ExpensesPage() {
                     </span>
                   </th>
                 ))}
-                <th className="table-th hidden md:table-cell cursor-pointer select-none hover:text-blue-600"
+                <th className="table-th hidden md:table-cell cursor-pointer select-none hover:text-red-500"
                     onClick={() => toggleSort('vendor')}>
                   <span className="flex items-center gap-1">
                     Furnitori
@@ -664,14 +664,14 @@ export default function ExpensesPage() {
                 </th>
                 <th className="table-th hidden lg:table-cell">Llogaria</th>
                 <th className="table-th hidden md:table-cell">Referenca</th>
-                <th className="table-th cursor-pointer select-none hover:text-blue-600"
+                <th className="table-th cursor-pointer select-none hover:text-red-500"
                     onClick={() => toggleSort('paidBy')}>
                   <span className="flex items-center gap-1">
                     Partneri
                     <span className="text-[10px]">{sortField === 'paidBy' ? (sortDir === 'asc' ? '↑' : '↓') : <span className="text-gray-300">↕</span>}</span>
                   </span>
                 </th>
-                <th className="table-th text-right cursor-pointer select-none hover:text-blue-600"
+                <th className="table-th text-right cursor-pointer select-none hover:text-red-500"
                     onClick={() => toggleSort('amount')}>
                   <span className="flex items-center justify-end gap-1">
                     Shuma
@@ -706,7 +706,7 @@ export default function ExpensesPage() {
                   </td>
                   <td className="table-td">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                      e.paidBy === 'Enndy' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                      e.paidBy === 'Enndy' ? 'bg-red-50 text-red-500' : 'bg-purple-50 text-purple-600'
                     }`}>
                       {e.paidBy || '—'}
                     </span>
@@ -716,7 +716,7 @@ export default function ExpensesPage() {
                   </td>
                   <td className="table-td">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="icon-btn text-blue-400 hover:bg-blue-50" onClick={() => openEdit(e)} title="Edito">
+                      <button className="icon-btn text-red-400 hover:bg-red-50" onClick={() => openEdit(e)} title="Edito">
                         ✏
                       </button>
                       <button className="icon-btn text-red-300 hover:bg-red-50 hover:text-red-500" onClick={() => openDelete(e)} title="Fshi">
@@ -734,7 +734,7 @@ export default function ExpensesPage() {
           {filtered.length > 0 && (
             <div className="hidden sm:flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50/40 text-xs">
               <div className="flex gap-4 text-gray-400">
-                <span>Enndy: <span className="font-bold text-blue-600">- {fmt(filtered.filter(e=>e.paidBy==='Enndy').reduce((s,e)=>s+e.amount,0))}</span></span>
+                <span>Enndy: <span className="font-bold text-red-500">- {fmt(filtered.filter(e=>e.paidBy==='Enndy').reduce((s,e)=>s+e.amount,0))}</span></span>
                 <span>Samki: <span className="font-bold text-purple-600">- {fmt(filtered.filter(e=>e.paidBy==='Samki').reduce((s,e)=>s+e.amount,0))}</span></span>
               </div>
               <span className="font-semibold text-gray-500">

@@ -78,7 +78,8 @@
       "Bash(vercel --prod --token=\"\")",
       "Bash(xargs grep -l \"item-row\")",
       "Bash(git fetch *)",
-      "Bash(grep -v \"formatDate\\\\|import\\\\|function\\\\|const\\\\|//\")"
+      "Bash(grep -v \"formatDate\\\\|import\\\\|function\\\\|const\\\\|//\")",
+      "Bash(xargs wc -l)"
     ]
   }
 }

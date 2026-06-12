@@ -102,7 +102,7 @@ function ItemModal({ item, onClose, isFormPage }) {
     <Modal
       title={
         <span className="flex items-center gap-2">
-          <Package size={18} className="text-blue-500" />
+          <Package size={18} className="text-red-500" />
           {isEdit ? 'Edito produktin' : 'Produkt / Shërbim i ri'}
         </span>
       }
@@ -298,7 +298,7 @@ export default function Items() {
 
   const SortIcon = ({ k }) =>
     sortKey === k
-      ? sortDir === 'asc' ? <ChevronUp size={13} className="text-blue-500"/> : <ChevronDown size={13} className="text-blue-500"/>
+      ? sortDir === 'asc' ? <ChevronUp size={13} className="text-red-500"/> : <ChevronDown size={13} className="text-red-500"/>
       : <ChevronUp size={13} className="text-gray-300"/>
 
   const openAdd    = ()    => navigate('items:create')
@@ -363,7 +363,7 @@ export default function Items() {
           <p className="text-xs text-gray-400 mt-0.5 font-medium">Artikuj gjithsej</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
-          <p className="text-2xl font-bold text-blue-600">{fmt(avgSale.toFixed(2))}</p>
+          <p className="text-2xl font-bold text-red-500">{fmt(avgSale.toFixed(2))}</p>
           <p className="text-xs text-gray-400 mt-0.5 font-medium">Çmimi mesatar shitje</p>
         </div>
         <div
@@ -391,7 +391,7 @@ export default function Items() {
       {/* Kërkim */}
       <div className="flex items-center gap-3 mb-4">
         <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2
-                        focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-50 transition-all flex-1 max-w-sm">
+                        focus-within:border-red-400 focus-within:ring-2 focus-within:ring-red-50 transition-all flex-1 max-w-sm">
           <Search size={14} className="text-gray-400 flex-shrink-0" />
           <input
             className="bg-transparent border-none outline-none text-sm text-gray-600 w-full placeholder-gray-400"
@@ -488,13 +488,13 @@ export default function Items() {
                 return (
                   <tr
                     key={item.id}
-                    className="hover:bg-blue-50/30 transition-colors group"
+                    className="hover:bg-red-50/30 transition-colors group"
                   >
                     {/* Emri */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                          <Package size={15} className="text-blue-500" />
+                        <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                          <Package size={15} className="text-red-500" />
                         </div>
                         <div>
                           <p className="font-semibold text-gray-800 text-sm">{item.name}</p>
@@ -549,7 +549,7 @@ export default function Items() {
                     <td className="px-5 py-3.5">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          className="icon-btn text-blue-500 hover:bg-blue-50"
+                          className="icon-btn text-red-500 hover:bg-red-50"
                           title="Edito"
                           onClick={() => openEdit(item)}
                         >

@@ -47,9 +47,9 @@ export function ContactImportButton({
   const baseStyles = 'flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all text-sm whitespace-nowrap'
 
   const variantStyles = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
+    primary: 'bg-red-500 text-white hover:bg-red-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
     secondary: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
-    outline: 'border border-blue-500 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
+    outline: 'border border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-blue-950 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed',
   }
 
   // Show tooltip if not supported

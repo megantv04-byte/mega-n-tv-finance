@@ -419,14 +419,14 @@ export default function ImportExcelModal({ entity, onImport, onClose }) {
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
 
           {/* Template download */}
-          <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+          <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-800/20 rounded-xl border border-red-100 dark:border-red-700">
             <div>
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300">Shkarko modelin Excel</p>
-              <p className="text-xs text-blue-600 dark:text-blue-400">Plotëso modelin me të dhënat tuaja, pastaj ngarko</p>
+              <p className="text-sm font-medium text-red-700 dark:text-red-300">Shkarko modelin Excel</p>
+              <p className="text-xs text-red-500 dark:text-red-400">Plotëso modelin me të dhënat tuaja, pastaj ngarko</p>
             </div>
             <button
               onClick={() => downloadTemplate(entity)}
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-colors"
             >
               <Download size={15} />
               Shkarko
@@ -436,7 +436,7 @@ export default function ImportExcelModal({ entity, onImport, onClose }) {
           {/* Upload zone */}
           <div
             onClick={() => fileRef.current?.click()}
-            className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
+            className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-8 text-center cursor-pointer hover:border-red-400 dark:hover:border-red-500 transition-colors"
           >
             <Upload size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
             <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Kliko për të zgjedhur file Excel</p>
