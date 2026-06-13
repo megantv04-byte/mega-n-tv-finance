@@ -245,40 +245,30 @@ export default function Tasks() {
 
   const syncTaskToSupabase = async (task) => {
     try {
+      // Only send fields that match the table schema
       const taskData = {
-        ...task,
+        id: task.id,
+        customer: task.customer,
+        description: task.description,
+        reminderDate: task.reminderDate,
+        completed: task.completed || false,
         orgId: currentOrg?.id || 'default',
-        updatedAt: new Date().toISOString(),
-        createdAt: task.createdAt || new Date().toISOString(),
       }
 
       console.log('Upserting task:', taskData)
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('tasks')
-        .upsert([taskData], { onConflict: 'id' })
+        .upsert(taskData)
 
       if (error) {
-        console.error('Supabase upsert error:', error)
+        console.error('Supabase upsert error:', error.message, error.details)
         throw error
       }
-      console.log('Task saved successfully')
+      console.log('Task saved to Supabase:', data)
       return true
     } catch (e) {
       console.error('Error syncing task:', e)
-      // Still save locally as fallback
-      try {
-        const saved = localStorage.getItem('xflow_tasks') || '[]'
-        const local = JSON.parse(saved)
-        const idx = local.findIndex(t => t.id === task.id)
-        if (idx >= 0) {
-          local[idx] = task
-        } else {
-          local.push(task)
-        }
-        localStorage.setItem('xflow_tasks', JSON.stringify(local))
-        console.log('Task saved to localStorage')
-      } catch {}
       return false
     }
   }
