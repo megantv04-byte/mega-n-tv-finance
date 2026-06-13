@@ -215,12 +215,13 @@ export default function Tasks() {
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
-        .order('reminderDate', { ascending: true })
+        .order('reminderdate', { ascending: true })
 
       if (error) {
         console.error('Supabase error:', error)
         throw error
       }
+      console.log('Loaded tasks from Supabase:', data)
       setTasks(data || [])
     } catch (e) {
       console.error('Error loading tasks:', e)
