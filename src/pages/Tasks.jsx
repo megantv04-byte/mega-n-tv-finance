@@ -221,8 +221,15 @@ export default function Tasks() {
         console.error('Supabase error:', error)
         throw error
       }
-      console.log('Loaded tasks from Supabase:', data)
-      setTasks(data || [])
+
+      // Convert lowercase columns to camelCase for component
+      const formattedTasks = (data || []).map(t => ({
+        ...t,
+        reminderDate: t.reminderdate,
+      }))
+
+      console.log('Loaded tasks from Supabase:', formattedTasks)
+      setTasks(formattedTasks)
     } catch (e) {
       console.error('Error loading tasks:', e)
       // Fall back to localStorage
