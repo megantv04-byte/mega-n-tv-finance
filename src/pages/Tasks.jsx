@@ -317,24 +317,35 @@ export default function Tasks() {
 
   const handleSaveTask = async (formData) => {
     try {
-      const synced = await syncTaskToSupabase(formData)
+      // Ensure orgId is set
+      const taskWithOrg = {
+        ...formData,
+        orgId: currentOrg?.id || 'default',
+        createdAt: formData.createdAt || new Date().toISOString(),
+      }
+
+      console.log('Saving task:', taskWithOrg)
+      console.log('Current org:', currentOrg)
+
+      const synced = await syncTaskToSupabase(taskWithOrg)
       if (synced) {
         if (editingTask) {
-          const updated = tasks.map(t => t.id === editingTask.id ? formData : t)
+          const updated = tasks.map(t => t.id === editingTask.id ? taskWithOrg : t)
           setTasks(updated)
           if (logActivity) logActivity(`Ndrysho detyrën: ${formData.customer}`, 'Detyrat')
           if (showToast) showToast('Detyra u ndryshua ✓')
         } else {
-          setTasks([...tasks, formData])
+          setTasks([...tasks, taskWithOrg])
           if (logActivity) logActivity(`Krijo detyrë: ${formData.customer}`, 'Detyrat')
           if (showToast) showToast('Detyra u krijua ✓')
         }
       } else {
-        if (showToast) showToast('Error saving task')
+        if (showToast) showToast('Error saving task - check console')
       }
       setShowModal(false)
     } catch (e) {
       console.error('Error saving task:', e)
+      if (showToast) showToast('Error: ' + e.message)
     }
   }
 
