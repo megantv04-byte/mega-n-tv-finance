@@ -18,11 +18,23 @@ export default function Sidebar() {
   const today          = new Date().toISOString().slice(0, 10)
   const subNotifyCount = invoices.filter(i => i.notifyDate && i.notifyDate <= today).length
 
+  // Get tasks from localStorage
+  const getTasks = () => {
+    try {
+      const saved = localStorage.getItem('xflow_tasks')
+      return saved ? JSON.parse(saved) : []
+    } catch {
+      return []
+    }
+  }
+  const tasks = getTasks()
+  const tasksDueBadge = tasks.filter(t => !t.completed && (t.reminderDate < today || t.reminderDate === today)).length
+
   const NAV = [
     { id: 'dashboard',     icon: LayoutDashboard, label: 'Dashboard' },
     { id: 'invoices',      icon: FileText,        label: 'Faturat',    badge: invoices.filter(i => i.status === 'pending' || i.status === 'overdue').length || null },
     { id: 'subscriptions', icon: Bell,            label: 'Abonimet',   badge: subNotifyCount || null, badgeColor: 'bg-orange-500' },
-    { id: 'tasks',         icon: CheckSquare,     label: 'Detyrat' },
+    { id: 'tasks',         icon: CheckSquare,     label: 'Detyrat',    badge: tasksDueBadge || null, badgeColor: 'bg-red-500' },
     { id: 'customers',     icon: UsersIcon,       label: 'Klientët' },
     { id: 'items',         icon: Package,         label: 'Produktet' },
     { id: 'payments',      icon: CreditCard,      label: 'Pagesat' },
