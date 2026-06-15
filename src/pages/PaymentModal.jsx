@@ -114,7 +114,7 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose, i
     depositAccount: editPayment.depositAccount || '',
     fee:            editPayment.fee > 0 ? String(editPayment.fee) : '',
     reference:      editPayment.reference || '',
-    depositedTo:    editPayment.depositedTo || 'Enndy',
+    depositedTo:    editPayment.depositedTo || '',
     notes:          editPayment.notes || '',
   } : {
     amount:         invoice?.amount ?? '',
@@ -124,7 +124,7 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose, i
     depositAccount: '',
     fee:            '',
     reference:      '',
-    depositedTo:    'Enndy',
+    depositedTo:    '',
     notes:          '',
   })
 
