@@ -1265,6 +1265,15 @@ export default function Invoices() {
             value={search}
             onChange={e => { setSearch(e.target.value); setPaginationPage(1) }}
           />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="text-gray-400 hover:text-gray-600 flex-shrink-0 cursor-pointer p-0.5 rounded hover:bg-gray-100 transition-colors"
+              title="Fshi kërkimin"
+            >
+              <X size={14}/>
+            </button>
+          )}
         </div>
         <select
           className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-red-400 cursor-pointer"
@@ -1530,10 +1539,16 @@ export default function Invoices() {
                                 <MoreVertical size={16}/>
                               </button>
 
-                              {/* Dropdown Menu - absolute positioning to scroll with row */}
-                              {isDropdownOpen && (
+                              {/* Dropdown Menu - fixed positioning as overlay */}
+                              {isDropdownOpen && (() => {
+                                const buttonRect = document.querySelector(`[data-invoice-id="${inv.id}"]`)?.getBoundingClientRect()
+                                return (
                                 <div
-                                  className="absolute w-48 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 pointer-events-auto top-full right-0 mt-1"
+                                  className="fixed w-48 bg-white border border-gray-200 rounded-lg shadow-2xl z-[9999] pointer-events-auto"
+                                  style={{
+                                    top: buttonRect ? buttonRect.bottom + 5 : '0',
+                                    right: window.innerWidth - (buttonRect ? buttonRect.right : 0),
+                                  }}
                                 >
                                   <button
                                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 flex items-center gap-2 border-b border-gray-100"
@@ -1631,7 +1646,8 @@ export default function Invoices() {
                                     <Trash2 size={14}/> Fshi
                                   </button>
                                 </div>
-                              )}
+                                )
+                              })()}
                             </div>
                           </div>
                         </td>
