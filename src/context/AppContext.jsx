@@ -24,11 +24,15 @@ function diffSync(table, curr, prevRef, orgId) {
   const prev = prevRef.current
   if (prev === curr) return               // asnjë ndryshim
 
+  // Use Map for O(1) lookups instead of O(n) find — avoids O(n²) on large arrays
+  const prevMap = new Map(prev.map(i => [i.id, i]))
+  const currMap = new Map(curr.map(i => [i.id, i]))
+
   const toUpsert = curr.filter(item => {
-    const old = prev.find(i => i.id === item.id)
+    const old = prevMap.get(item.id)
     return !old || JSON.stringify(old) !== JSON.stringify(item)
   })
-  const toDelete = prev.filter(item => !curr.find(i => i.id === item.id))
+  const toDelete = prev.filter(item => !currMap.has(item.id))
 
   prevRef.current = curr
 
