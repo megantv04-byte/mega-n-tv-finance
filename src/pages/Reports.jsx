@@ -19,7 +19,7 @@ const PARTNERS   = ['Enndy', 'Belti']
 const P_COLOR    = { Enndy: '#7c3aed', Belti: '#059669' }
 
 /* ── estimated 2025 client data (nuk kemi te dhena reale 2025) ── */
-const EST_CLIENTS_2025 = [0, 0, 3, 4, 5, 5, 5, 5, 5, 5, 5, 4]
+const EST_CLIENTS_2025 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 /* ─── helpers ─── */
 function lastDayOfMonth(year, month) {
@@ -70,9 +70,9 @@ function FinanciareTab({ invoices, expenses, fmt }) {
   const statusColors = { paid:'#059669', pending:'#d97706', overdue:'#dc2626', draft:'#9ca3af' }
 
   const KPIS = [
-    { label:'Të ardhura totale', val: fmt(paid + 42000),    icon: TrendingUp,   bg:'#eff6ff', color:'#2563eb' },
-    { label:'Shpenzime totale',  val: fmt(totalExp),         icon: TrendingDown, bg:'#fef2f2', color:'#dc2626' },
-    { label:'Fitimi neto',       val: fmt(profit + 32000),   icon: DollarSign,   bg:'#ecfdf5', color:'#059669' },
+    { label:'Të ardhura totale', val: fmt(paid),    icon: TrendingUp,   bg:'#eff6ff', color:'#2563eb' },
+    { label:'Shpenzime totale',  val: fmt(totalExp), icon: TrendingDown, bg:'#fef2f2', color:'#dc2626' },
+    { label:'Fitimi neto',       val: fmt(profit),   icon: DollarSign,   bg:'#ecfdf5', color:'#059669' },
   ]
   const TABS = [
     { id:'revenue',  label:'Të ardhurat', key:'revenue',  color:'#3b82f6' },
