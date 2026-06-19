@@ -6,7 +6,7 @@ import { formatDate } from '../utils/dateFormat'
 /* ── Vetëm abonimi nga Korriku e tutje ── */
 const AUTO_FROM = '2026-07-01'
 
-const cleanPhone = p => (p || '').replace(/[\s+\-()]/g, '')
+const cleanPhone = p => String(p ?? '').replace(/[\s+\-()]/g, '')
 
 function addDays(dateStr, days) {
   const d = new Date(dateStr)

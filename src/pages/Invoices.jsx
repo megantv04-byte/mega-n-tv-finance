@@ -19,7 +19,7 @@ import MessageLogService from '../services/MessageLogService'
 const STATUS_ORDER = { overdue: 0, pending: 1, partial: 1.5, draft: 2, paid: 3, void: 4 }
 
 /* ── helpers ─────────────────────────────────────────── */
-const cleanPhone = p => (p || '').replace(/[\s+\-()]/g, '')
+const cleanPhone = p => String(p ?? '').replace(/[\s+\-()]/g, '')
 
 function buildReminderMsg(inv) {
   const firstName = (inv.customer || '').split(' ')[0]

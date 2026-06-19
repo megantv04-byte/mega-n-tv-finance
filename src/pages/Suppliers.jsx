@@ -6,7 +6,7 @@ import {
 import { useApp } from '../context/AppContext'
 import { Modal, FormGroup, EmptyState } from '../components/UI'
 
-const cleanPhone = p => (p || '').replace(/[\s+\-()]/g, '')
+const cleanPhone = p => String(p ?? '').replace(/[\s+\-()]/g, '')
 
 /* ══════════════════════════════════════════════════════════
    Modal — shto / edito furnitor
