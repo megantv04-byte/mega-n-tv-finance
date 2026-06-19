@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, AlertCircle, Zap } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react'
 
 export default function Login({ users = [], onLogin }) {
   const [username, setUsername] = useState('')
@@ -45,9 +45,7 @@ export default function Login({ users = [], onLogin }) {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-md">
-            <Zap size={20} strokeWidth={2.5} />
-          </div>
+          <img src="/logo.svg" alt="MEGA N TV" className="w-10 h-10 rounded-xl shadow-md" />
           <div>
             <p className="text-lg font-black text-gray-900 leading-none tracking-tight">MEGA N TV Flow</p>
             <p className="text-[10px] text-gray-400 tracking-widest uppercase mt-0.5">Menaxhimi Financiar</p>
