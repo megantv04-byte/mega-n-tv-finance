@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, Filter, Users, Wallet, FileSpreadsheet,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
-import { consumeNavFilter } from '../context/navFilter'
+import { getNavFilter, clearNavFilter } from '../context/navFilter'
 import { formatDate } from '../utils/dateFormat'
 import { useFeatures } from '../features/useFeatures'
 import { EmptyState, Modal, FormGroup, Pagination } from '../components/UI'
@@ -291,12 +291,7 @@ export default function ExpensesPage() {
   const [partnerFilt,    setPartner]       = useState('all')
   const [typeFilt,       setType]          = useState('all')
   const [recurFilt,      setRecurFilt]     = useState('all')
-  const [yearFilt,       setYearFilt]      = useState('all')
-
-  useEffect(() => {
-    const f = consumeNavFilter()
-    if (f?.yearFilt) setYearFilt(f.yearFilt)
-  }, [])
+  const [yearFilt,       setYearFilt]      = useState(() => { const f = getNavFilter(); clearNavFilter(); return f?.yearFilt || 'all' })
   const [pg,             setPg]            = useState(1)
   const [perPage,        setPerPage]       = useState(50)
   const [sortField,      setSortField]     = useState('date')

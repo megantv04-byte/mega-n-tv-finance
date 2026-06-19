@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense, useMemo, useRef } from 'react'
-import { consumeNavFilter } from '../context/navFilter'
+import { getNavFilter, clearNavFilter } from '../context/navFilter'
 import {
   FileText, Download, Pencil, Trash2, CreditCard,
   MessageCircle, Send, XCircle, X, MessageSquare,
@@ -716,16 +716,8 @@ export default function Invoices() {
     localStorage.removeItem('meganntv_invoice_search') // Clear it after reading
     return headerSearch || ''
   })
-  const [statusFilter, setStatus]   = useState('all')
-  const [typeFilter,   setTypeFilter]= useState('all')   // 'all' | 'reseller' | 'individual'
-
-  // Apply nav filter from Dashboard on mount
-  useEffect(() => {
-    const f = consumeNavFilter()
-    if (!f) return
-    if (f.statusFilter) setStatus(f.statusFilter)
-    if (f.typeFilter)   setTypeFilter(f.typeFilter)
-  }, [])
+  const [statusFilter, setStatus]    = useState(() => { const f = getNavFilter(); clearNavFilter(); return f?.statusFilter || 'all' })
+  const [typeFilter,   setTypeFilter] = useState(() => getNavFilter()?.typeFilter || 'all')
   const [paginationPage,  setPaginationPage] = useState(1)
   const [perPage,      setPerPage]  = useState(50)
   const [sortField,    setSortField]= useState('id')
