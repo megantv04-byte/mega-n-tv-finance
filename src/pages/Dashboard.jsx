@@ -258,19 +258,25 @@ export default function Dashboard() {
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-50">
               <p className="text-sm font-bold text-gray-800">Shitje sipas muajit — krahasim</p>
               <div className="flex gap-3 text-[11px] text-gray-400">
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"/>Shitje {thisYear}</span>
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block"/>Shitje {prevYear}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full inline-block" style={{background:'#6366f1'}}/>Shitje {thisYear}</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full inline-block" style={{background:'#e2e8f0'}}/>Shitje {prevYear}</span>
               </div>
             </div>
             <div className="px-2 py-5">
               <ResponsiveContainer width="100%" height={220}>
                 <ComposedChart data={salesComparison} margin={{ top: 4, right: 8, left: -12, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? v/1000+'k' : v} />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Bar dataKey="sales"     name={`Shitje ${thisYear}`} fill="#10b981" radius={[4,4,0,0]} maxBarSize={20} />
-                  <Bar dataKey="salesPrev" name={`Shitje ${prevYear}`} fill="#93c5fd" radius={[4,4,0,0]} maxBarSize={20} />
+                  <defs>
+                    <linearGradient id="gradCurr" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity={1} />
+                      <stop offset="100%" stopColor="#818cf8" stopOpacity={0.85} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? v/1000+'k' : v} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ fill: '#f8fafc' }} />
+                  <Bar dataKey="salesPrev" name={`Shitje ${prevYear}`} fill="#e2e8f0" radius={[4,4,0,0]} maxBarSize={20} />
+                  <Bar dataKey="sales"     name={`Shitje ${thisYear}`} fill="url(#gradCurr)" radius={[4,4,0,0]} maxBarSize={20} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
