@@ -154,7 +154,8 @@ export function FormGroup({ label, children }) {
 }
 
 export function Avatar({ name, color, size = 40 }) {
-  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+  const safe = name != null ? String(name) : '?'
+  const initials = safe.split(' ').map(w => w[0]).filter(Boolean).join('').slice(0, 2).toUpperCase() || '?'
   return (
     <div
       className="flex items-center justify-center rounded-xl font-bold text-white flex-shrink-0"

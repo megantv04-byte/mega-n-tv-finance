@@ -13,7 +13,6 @@ import { countries } from '../data/mockData'
 import { downloadTemplate } from '../components/ImportExcelModal'
 const ImportExcelModal = lazy(() => import('../components/ImportExcelModal'))
 import { ContactImportButton } from '../features/contacts'
-import { supabase } from '../lib/supabase'
 
 const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#be185d','#0f766e']
 
@@ -612,21 +611,10 @@ export default function Customers() {
     }
   }, [isFormMode, closeModal])
 
-  async function handleImportCustomers(rows) {
+  function handleImportCustomers(rows) {
     const existing = new Set(customers.map(c => c.name?.toLowerCase()))
     const news = rows.filter(r => !existing.has(r.name?.toLowerCase()))
     if (!news.length) { showToast('Nuk ka klientë të rinj për import', 'info'); return }
-
-    // Write directly to Supabase in batches of 100
-    if (supabase && currentOrgId) {
-      const BATCH = 100
-      const supabaseRows = news.map(d => ({ id: d.id, data: { ...d, orgId: currentOrgId } }))
-      for (let i = 0; i < supabaseRows.length; i += BATCH) {
-        const { error } = await supabase.from('customers').upsert(supabaseRows.slice(i, i + BATCH))
-        if (error) console.error('[Import] Supabase error:', error)
-      }
-    }
-
     setCustomers(prev => [...prev, ...news])
     showToast(`U importuan ${news.length} klientë të rinj ✓`, 'success')
     logActivity(`Importoi ${news.length} klientë`, 'Klientët')
@@ -747,10 +735,12 @@ export default function Customers() {
   const endIdx = startIdx + ITEMS_PER_PAGE
   const paginatedCustomers = filtered.slice(startIdx, endIdx)
 
-  // Reset to page 1 when filters change
-  if (currentPage > totalPages && currentPage > 1) {
-    setCurrentPage(1)
-  }
+  // Reset to page 1 when filters change (must be in useEffect, not render body)
+  useEffect(() => {
+    if (currentPage > 1 && totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(1)
+    }
+  }, [currentPage, totalPages])
 
   return (
     <div>
