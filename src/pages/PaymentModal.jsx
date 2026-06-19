@@ -120,11 +120,11 @@ export default function PaymentModal({ invoice, payment: editPayment, onClose, i
     amount:         invoice?.amount ?? '',
     date:           today,
     paidDate:       today,
-    method:         paymentModes[0],
-    depositAccount: '',
+    method:         'Kesh',
+    depositAccount: 'Kesh - Bledi',
     fee:            '',
     reference:      '',
-    depositedTo:    '',
+    depositedTo:    'Bledi',
     notes:          '',
   })
 
