@@ -4,6 +4,7 @@ import {
   Pencil, Trash2, FileSpreadsheet, Plus,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
+import { consumeNavFilter } from '../context/navFilter'
 import { formatDate } from '../utils/dateFormat'
 import { EmptyState, Pagination } from '../components/UI'
 import FormPageWrapper from '../components/FormPageWrapper'
@@ -101,6 +102,12 @@ export default function Payments() {
 
   const [search,      setSearch]    = useState('')
   const [monthFilt,   setMonthFilt] = useState('all')
+
+  useEffect(() => {
+    const f = consumeNavFilter()
+    if (f?.monthFilt) setMonthFilt(f.monthFilt)
+  }, [])
+
   const [partnerFilt, setPartner]   = useState('all')
   const [methodFilt,  setMethod]    = useState('all')
   const [pg,          setPg]        = useState(1)

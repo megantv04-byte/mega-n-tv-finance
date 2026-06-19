@@ -1,4 +1,5 @@
-import { useState, useEffect, lazy, Suspense, useMemo } from 'react'
+import { useState, useEffect, lazy, Suspense, useMemo, useRef } from 'react'
+import { consumeNavFilter } from '../context/navFilter'
 import {
   FileText, Download, Pencil, Trash2, CreditCard,
   MessageCircle, Send, XCircle, X, MessageSquare,
@@ -717,6 +718,14 @@ export default function Invoices() {
   })
   const [statusFilter, setStatus]   = useState('all')
   const [typeFilter,   setTypeFilter]= useState('all')   // 'all' | 'reseller' | 'individual'
+
+  // Apply nav filter from Dashboard on mount
+  useEffect(() => {
+    const f = consumeNavFilter()
+    if (!f) return
+    if (f.statusFilter) setStatus(f.statusFilter)
+    if (f.typeFilter)   setTypeFilter(f.typeFilter)
+  }, [])
   const [paginationPage,  setPaginationPage] = useState(1)
   const [perPage,      setPerPage]  = useState(50)
   const [sortField,    setSortField]= useState('id')
@@ -816,9 +825,10 @@ export default function Invoices() {
     // Status filter - special handling for 'overdue'
     if (statusFilter !== 'all') {
       if (statusFilter === 'overdue') {
-        // Overdue includes: explicit 'overdue' status OR pending with past due date
         const isOverdue = i.status === 'overdue' || (i.status === 'pending' && i.due && i.due < today)
         if (!isOverdue) return false
+      } else if (statusFilter === 'unpaid') {
+        if (!['pending', 'overdue', 'partial'].includes(i.status)) return false
       } else {
         if (i.status !== statusFilter) return false
       }
