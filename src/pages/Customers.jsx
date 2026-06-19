@@ -13,6 +13,7 @@ import { countries } from '../data/mockData'
 import { downloadTemplate } from '../components/ImportExcelModal'
 const ImportExcelModal = lazy(() => import('../components/ImportExcelModal'))
 import { ContactImportButton } from '../features/contacts'
+import { supabase } from '../lib/supabase'
 
 const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#be185d','#0f766e']
 
@@ -587,7 +588,7 @@ const CustomerCard = memo(function CustomerCard({ c, onEdit, fmt, isLatePayer, o
    Faqja kryesore
 ══════════════════════════════════════════════════════════ */
 export default function Customers() {
-  const { customers, setCustomers, closeModal, fmt, invoices, showToast, page, navigate, logActivity } = useApp()
+  const { customers, setCustomers, closeModal, fmt, invoices, showToast, page, navigate, logActivity, currentOrgId } = useApp()
   const [search,        setSearch]        = useState('')
   const [typeFilt,      setTypeFilt]      = useState('all')
   const [countryFilt,   setCountryFilt]   = useState('all')
@@ -611,13 +612,24 @@ export default function Customers() {
     }
   }, [isFormMode, closeModal])
 
-  function handleImportCustomers(rows) {
-    setCustomers(prev => {
-      const existing = new Set(prev.map(c => c.name?.toLowerCase()))
-      const news = rows.filter(r => !existing.has(r.name?.toLowerCase()))
-      showToast(`U importuan ${news.length} klientë të rinj`, 'success')
-      return [...prev, ...news]
-    })
+  async function handleImportCustomers(rows) {
+    const existing = new Set(customers.map(c => c.name?.toLowerCase()))
+    const news = rows.filter(r => !existing.has(r.name?.toLowerCase()))
+    if (!news.length) { showToast('Nuk ka klientë të rinj për import', 'info'); return }
+
+    // Write directly to Supabase in batches of 100
+    if (supabase && currentOrgId) {
+      const BATCH = 100
+      const supabaseRows = news.map(d => ({ id: d.id, data: { ...d, orgId: currentOrgId } }))
+      for (let i = 0; i < supabaseRows.length; i += BATCH) {
+        const { error } = await supabase.from('customers').upsert(supabaseRows.slice(i, i + BATCH))
+        if (error) console.error('[Import] Supabase error:', error)
+      }
+    }
+
+    setCustomers(prev => [...prev, ...news])
+    showToast(`U importuan ${news.length} klientë të rinj ✓`, 'success')
+    logActivity(`Importoi ${news.length} klientë`, 'Klientët')
   }
 
   const handleDeleteCustomer = (customerId) => {

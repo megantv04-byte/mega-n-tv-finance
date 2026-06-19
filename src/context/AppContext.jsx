@@ -37,15 +37,15 @@ function diffSync(table, curr, prevRef, orgId) {
   prevRef.current = curr
 
   if (toUpsert.length) {
-    supabase.from(table).upsert(
-      toUpsert.map(d => ({ id: d.id, data: { ...d, orgId: orgId || d.orgId } }))
-    ).then(result => {
-      if (result.error) {
-        console.error(`[diffSync] Error upserting ${table}:`, result.error)
-      }
-    }).catch(err => {
-      console.error(`[diffSync] Error upserting ${table}:`, err)
-    })
+    const BATCH = 100
+    const rows = toUpsert.map(d => ({ id: d.id, data: { ...d, orgId: orgId || d.orgId } }))
+    for (let i = 0; i < rows.length; i += BATCH) {
+      supabase.from(table).upsert(rows.slice(i, i + BATCH)).then(result => {
+        if (result.error) console.error(`[diffSync] Error upserting ${table}:`, result.error)
+      }).catch(err => {
+        console.error(`[diffSync] Error upserting ${table}:`, err)
+      })
+    }
   }
   if (toDelete.length) {
     supabase.from(table).delete().in('id', toDelete.map(d => d.id)).then(result => {
