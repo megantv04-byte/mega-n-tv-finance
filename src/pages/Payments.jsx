@@ -109,6 +109,7 @@ export default function Payments() {
   const [sortDir,     setSortDir]   = useState('desc')
   const [deletingId,  setDeletingId] = useState(null)
   const [importOpen,  setImportOpen] = useState(false)
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false)
 
   // Detect if we're in form mode (page like "payments:create" or "payments:ID:edit")
   const pageMatch = page.split(':')
@@ -202,6 +203,14 @@ export default function Payments() {
     showToast(`U importuan ${newPayments.length} pagesa · ${markedPaid} fatura u shënuan si të paguara ✓`)
   }
 
+  const deleteAllPayments = () => {
+    const count = payments.length
+    setPayments([])
+    logActivity(`Fshiu të gjitha ${count} pagesat`, 'Pagesat')
+    showToast(`U fshin ${count} pagesa ✓`, 'success')
+    setDeleteAllOpen(false)
+  }
+
   const deletePayment = (p) => {
     setPayments(prev => prev.filter(x => x.id !== p.id))
     setInvoices(prev => prev.map(i =>
@@ -241,6 +250,17 @@ export default function Payments() {
           <p className="text-sm text-gray-400 mt-0.5">{payments.length} pagesa gjithsej</p>
         </div>
         <div className="flex items-center gap-1.5">
+          {/* Fshi të gjitha - Hidden on mobile */}
+          {payments.length > 0 && (
+            <button
+              className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+              onClick={() => setDeleteAllOpen(true)}
+              title="Fshi të gjitha pagesat"
+            >
+              <Trash2 size={16}/>
+            </button>
+          )}
+
           {/* Export - Hidden on mobile */}
           <button
             className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
@@ -614,6 +634,40 @@ export default function Payments() {
       >
         <Plus size={28}/>
       </div>
+
+      {/* Konfirmim fshirje të gjitha */}
+      {deleteAllOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+                <Trash2 size={20} className="text-red-500"/>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Fshi të gjitha pagesat</h3>
+                <p className="text-xs text-gray-500 mt-0.5">Kjo veprim nuk mund të kthehet</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-5">
+              Je i sigurt që dëshiron të fshish të gjitha <strong>{payments.length} pagesat</strong>? Faturat nuk do të ndryshohen.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={deleteAllPayments}
+                className="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl transition-colors"
+              >
+                Po, fshi të gjitha
+              </button>
+              <button
+                onClick={() => setDeleteAllOpen(false)}
+                className="flex-1 py-2 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Anulo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
