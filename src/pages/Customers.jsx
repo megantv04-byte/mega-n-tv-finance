@@ -17,7 +17,7 @@ import { ContactImportButton } from '../features/contacts'
 const COLORS = ['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#be185d','#0f766e']
 
 /* ── helper: pastro numrin e telefonit për URL ── */
-const cleanPhone = p => (p || '').replace(/[\s\+\-\(\)]/g, '')
+const cleanPhone = p => String(p ?? '').replace(/[\s\+\-\(\)]/g, '')
 
 /* ══════════════════════════════════════════════════════════
    Searchable combobox "Referuar nga"
