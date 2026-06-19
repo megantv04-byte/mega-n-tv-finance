@@ -28,7 +28,7 @@ export default function Header() {
   const [searchInput, setSearchInput] = useState('')
   const [readNotifications, setReadNotifications] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('arestv_read_notifications') || '{}')
+      return JSON.parse(localStorage.getItem('meganntv_read_notifications') || '{}')
     } catch {
       return {}
     }
@@ -49,7 +49,7 @@ export default function Header() {
 
       if (customer) {
         // Navigate to invoices with customer filter
-        localStorage.setItem('arestv_invoice_search', customer.name)
+        localStorage.setItem('meganntv_invoice_search', customer.name)
         navigate('invoices')
       }
     }
@@ -57,12 +57,12 @@ export default function Header() {
 
   const handleSearchClear = () => {
     setSearchInput('')
-    localStorage.removeItem('arestv_invoice_search')
+    localStorage.removeItem('meganntv_invoice_search')
   }
 
   // Persist read notifications to localStorage
   useEffect(() => {
-    localStorage.setItem('arestv_read_notifications', JSON.stringify(readNotifications))
+    localStorage.setItem('meganntv_read_notifications', JSON.stringify(readNotifications))
   }, [readNotifications])
 
   // Close dropdown when clicking outside
@@ -105,9 +105,9 @@ export default function Header() {
       </button>
 
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <img src="/logo.svg" alt="AresTV Flow" className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
+        <img src="/logo.svg" alt="MEGA N TV Flow" className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
         <h1 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100 truncate">
-          {PAGE_TITLES[page] || 'AresTV Flow'}
+          {PAGE_TITLES[page] || 'MEGA N TV Flow'}
         </h1>
       </div>
 

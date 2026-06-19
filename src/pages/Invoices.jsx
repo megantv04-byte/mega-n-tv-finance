@@ -439,7 +439,7 @@ function InvoiceSidePanel({ invId, onClose, setSelectedCustomer }) {
               <div><p className="text-gray-400 mb-0.5">Metoda</p><p className="font-semibold text-gray-700">{linkedPayment.method}</p></div>
               <div>
                 <p className="text-gray-400 mb-0.5">Tek</p>
-                <p className={`font-bold ${linkedPayment.depositedTo === 'Enndy' ? 'text-blue-500' : 'text-purple-600'}`}>
+                <p className={`font-bold ${linkedPayment.depositedTo === 'Bledi' ? 'text-blue-500' : 'text-purple-600'}`}>
                   {linkedPayment.depositedTo}
                 </p>
               </div>
@@ -711,8 +711,8 @@ export default function Invoices() {
 
   const [search,       setSearch]   = useState(() => {
     // Load search from header if user searched by customer name
-    const headerSearch = localStorage.getItem('arestv_invoice_search')
-    localStorage.removeItem('arestv_invoice_search') // Clear it after reading
+    const headerSearch = localStorage.getItem('meganntv_invoice_search')
+    localStorage.removeItem('meganntv_invoice_search') // Clear it after reading
     return headerSearch || ''
   })
   const [statusFilter, setStatus]   = useState('all')

@@ -125,7 +125,7 @@ Organization Roles (Per Org)
 ### ⏳ Next Phases
 
 #### PHASE 2: Integration & Testing
-- [ ] Test authentication flow with existing users (Enndy, Belti, Samki)
+- [ ] Test authentication flow with existing users (Bledi, Belti, XXX)
 - [ ] Verify Super Admin can see OrgManager
 - [ ] Verify regular users see organization app
 - [ ] Test session persistence on page reload
@@ -262,7 +262,7 @@ All records now follow this pattern:
 
 ### Manual Testing Checklist
 
-1. **Login as Super Admin (Enndy)**
+1. **Login as Super Admin (Bledi)**
    ```
    Username: enndy
    Password: [see mockData]

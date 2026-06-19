@@ -8,9 +8,9 @@
 
 | User | Username | Password | Role | Org | IsSuperAdmin |
 |------|----------|----------|------|-----|--------------|
-| Enndy | `xpmx` | `enndy123` | admin | ORG-001 | ✅ YES |
+| Bledi | `xpmx` | `bledi123` | admin | ORG-001 | ✅ YES |
 | Belti | `belti` | `belti123` | editor | ORG-001 | ❌ NO |
-| Samki | `samki` | `samki123` | editor | ORG-001 | ❌ NO |
+| XXX | `xxx` | `xxx123` | editor | ORG-001 | ❌ NO |
 | Test | `test` | `test` | tester | ORG-001 | ❌ NO |
 
 ---
@@ -45,7 +45,7 @@
 
 ## 📋 Phase 2 Test Plan
 
-### ✅ Test 1: Super Admin Login (Enndy)
+### ✅ Test 1: Super Admin Login (Bledi)
 **Objective:** Verify super admin sees OrgManager interface
 **Status:** ✅ CODE VERIFIED
 
@@ -65,7 +65,7 @@
 
 **Manual Test Command (Run in Browser Console):**
 ```javascript
-// After logging in as Enndy
+// After logging in as Bledi
 const session = JSON.parse(localStorage.getItem('xflow_session'))
 console.log('Super Admin:', session.isSuperAdmin) // Should be: true
 console.log('User:', session.username) // Should be: xpmx
@@ -235,10 +235,10 @@ console.log('Session After Timeout:', localStorage.getItem('xflow_session')) // 
 
 ### Quick Test Sequence
 
-**Test 1: Super Admin Login (Enndy)**
+**Test 1: Super Admin Login (Bledi)**
 1. Clear localStorage: `localStorage.clear(); location.reload()`
 2. Wait for reload
-3. Login: username=`xpmx`, password=`enndy123`
+3. Login: username=`xpmx`, password=`bledi123`
 4. Expected: See "OrgManager" in interface
 5. Console: Run commands above to verify session
 

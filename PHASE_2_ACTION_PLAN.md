@@ -31,7 +31,7 @@
 
 **Credentials:**
 - Username: **`xpmx`**
-- Password: **`enndy123`**
+- Password: **`bledi123`**
 
 **After Login - Expected:**
 - ✅ Page shows "OrgManager" view
@@ -167,7 +167,7 @@ console.log('✅ Data Isolation OK:', leaked.length === 0)
 
 ```
 SUPER ADMIN LOGIN (Enndy)
-[ ] Username xpmx / password enndy123 accepted
+[ ] Username xpmx / password bledi123 accepted
 [ ] OrgManager interface shown
 [ ] Organization list visible
 [ ] User management section visible
@@ -308,9 +308,9 @@ http://localhost:5173
 
 **Test Users:**
 ```
-Super Admin: xpmx / enndy123
+Super Admin: xpmx / bledi123
 Org User:   belti / belti123
-Org User:   samki / samki123
+Org User:   xxx / xxx123
 Tester:     test / test
 ```
 

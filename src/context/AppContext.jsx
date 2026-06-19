@@ -65,7 +65,7 @@ export function AppProvider({ children }) {
 
   /* ── UI states ── */
   const [currency,         setCurrency]         = useState(currencies[0])
-  const [darkMode,         setDarkMode]         = useState(() => localStorage.getItem('arestv_dark') === 'true')
+  const [darkMode,         setDarkMode]         = useState(() => localStorage.getItem('meganntv_dark') === 'true')
   const [toast,            setToast]            = useState(null)
   const [modal,            setModal]            = useState(null)
   const [page,             setPage]             = useState(() => {
@@ -79,7 +79,7 @@ export function AppProvider({ children }) {
   const [loading,          setLoading]          = useState(false)
   const [dbLoading,        setDbLoading]        = useState(!!supabase) // loading initial kur ka Supabase
   const [sidebarOpen,      setSidebarOpen]      = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('arestv_sidebar') === 'true')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('meganntv_sidebar') === 'true')
 
   /* ── Organizations ── */
   const [organizations, setOrganizations] = useState(mockOrganizations)
@@ -87,7 +87,7 @@ export function AppProvider({ children }) {
   /* ── Users & Auth ── */
   const _loadedUsers = (() => {
     try {
-      const saved = localStorage.getItem('arestv_users')
+      const saved = localStorage.getItem('meganntv_users')
       if (!saved) return mockUsers
       const stored = JSON.parse(saved)
       // Sync immutable base fields from mockData (username, role, orgId, isSuperAdmin)
@@ -106,14 +106,14 @@ export function AppProvider({ children }) {
   const [users,       setUsers]       = useState(_loadedUsers)
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('arestv_user')
+      const saved = localStorage.getItem('meganntv_user')
       if (!saved) return null
       const parsed = JSON.parse(saved)
       return _loadedUsers.find(u => u.id === parsed.id && u.active !== false) || null
     } catch { return null }
   })
   const [activityLog, setActivityLog] = useState(() => {
-    const saved = localStorage.getItem('arestv_activity_log')
+    const saved = localStorage.getItem('meganntv_activity_log')
     return saved ? JSON.parse(saved) : mockActivityLog
   })
 
@@ -195,7 +195,7 @@ export function AppProvider({ children }) {
   const [items,           setItems]           = useState([])
   const [representatives, setRepresentatives] = useState(() => {
     try {
-      const saved = localStorage.getItem('arestv_representatives')
+      const saved = localStorage.getItem('meganntv_representatives')
       return saved ? JSON.parse(saved) : []
     } catch {
       return []
@@ -424,7 +424,7 @@ export function AppProvider({ children }) {
   // Always save activities to localStorage, and also sync to Supabase if available
   useEffect(() => {
     // Always persist to localStorage for immediate access on refresh
-    localStorage.setItem('arestv_activity_log', JSON.stringify(activityLog))
+    localStorage.setItem('meganntv_activity_log', JSON.stringify(activityLog))
 
     // Also sync to Supabase if available
     if (canSync && supabase) {
@@ -490,7 +490,7 @@ export function AppProvider({ children }) {
       'arxhend zabeli', 'egzon pllana', 'juve87', 'clirim kokollari',
       'drinitv', 'elton zale', 'kematv', 'ali tetova', 'isz90',
       'promedia tv', 'monotv', 'pingtv', 'fresh tv', 'shkodran shabani',
-      'lizzaa', 'ares tv', 'luha65',
+      'lizzaa', 'mega n tv', 'luha65',
     ])
 
     // Grumbulloj emrat e të gjithë klientëve (për validimin e referredBy)
@@ -528,28 +528,28 @@ export function AppProvider({ children }) {
      Persist users & currentUser në localStorage
   ══════════════════════════════════════════════════════════ */
   useEffect(() => {
-    localStorage.setItem('arestv_users', JSON.stringify(users))
+    localStorage.setItem('meganntv_users', JSON.stringify(users))
   }, [users])
 
   useEffect(() => {
-    if (currentUser) localStorage.setItem('arestv_user', JSON.stringify(currentUser))
-    else             localStorage.removeItem('arestv_user')
+    if (currentUser) localStorage.setItem('meganntv_user', JSON.stringify(currentUser))
+    else             localStorage.removeItem('meganntv_user')
   }, [currentUser])
 
   /* ── Dark mode ── */
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
-    localStorage.setItem('arestv_dark', darkMode)
+    localStorage.setItem('meganntv_dark', darkMode)
   }, [darkMode])
 
   /* ── Sidebar collapse ── */
   useEffect(() => {
-    localStorage.setItem('arestv_sidebar', sidebarCollapsed)
+    localStorage.setItem('meganntv_sidebar', sidebarCollapsed)
   }, [sidebarCollapsed])
 
   /* ── Representatives persistence ── */
   useEffect(() => {
-    localStorage.setItem('arestv_representatives', JSON.stringify(representatives))
+    localStorage.setItem('meganntv_representatives', JSON.stringify(representatives))
   }, [representatives])
 
   /* ── Browser history management for page and modal navigation ── */
@@ -602,8 +602,8 @@ export function AppProvider({ children }) {
     setCurrentUser(null)
     setPage('dashboard')
     // Clear both AppContext and TenantContext
-    localStorage.removeItem('arestv_user')
-    localStorage.removeItem('arestv_session')
+    localStorage.removeItem('meganntv_user')
+    localStorage.removeItem('meganntv_session')
   }, [])
 
   /* ── Log activity ── */

@@ -10,10 +10,10 @@ export default function Settings() {
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
   const [companyData, setCompanyData] = useState(() => {
-    const saved = localStorage.getItem('arestv_company_data')
+    const saved = localStorage.getItem('meganntv_company_data')
     return saved ? JSON.parse(saved) : {
-      companyName: 'AresTV Flow Studio',
-      email: 'info@arestv.ks',
+      companyName: 'MEGA N TV Studio',
+      email: 'info@meganntv.ks',
       phone: '+383 44 100 200',
       address: 'Rruga Nënë Tereza 12, Prishtinë',
       language: 'Shqip (Kosovë)',
@@ -27,7 +27,7 @@ export default function Settings() {
     autoWhatsApp: true,
   })
   const [advanceDays, setAdvanceDays] = useState(() => {
-    const saved = localStorage.getItem('arestv_notif_advance_days')
+    const saved = localStorage.getItem('meganntv_notif_advance_days')
     return saved ? parseInt(saved) : 7
   })
   const [showRestoreConfirm, setShowRestoreConfirm] = useState(false)
@@ -45,7 +45,7 @@ export default function Settings() {
 
   // Save company data to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('arestv_company_data', JSON.stringify(companyData))
+    localStorage.setItem('meganntv_company_data', JSON.stringify(companyData))
   }, [companyData])
 
   const handleSaveAdvanceDays = () => {
@@ -53,12 +53,12 @@ export default function Settings() {
       showToast('Numri i ditëve duhet të jetë ndërmjet 0 dhe 90', 'error')
       return
     }
-    localStorage.setItem('arestv_notif_advance_days', advanceDays.toString())
+    localStorage.setItem('meganntv_notif_advance_days', advanceDays.toString())
     showToast('Cilësimet e njoftimeve u ruajtën ✓', 'success')
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('arestv_auth')
+    localStorage.removeItem('meganntv_auth')
     window.location.reload()
   }
 
@@ -174,8 +174,8 @@ export default function Settings() {
     {
       title: 'Profili i kompanisë', icon: Building2,
       rows: [
-        { label: 'Emri i kompanisë', sub: 'AresTV Flow Studio', type: 'field' },
-        { label: 'Email', sub: 'info@arestv.ks', type: 'field' },
+        { label: 'Emri i kompanisë', sub: 'MEGA N TV Studio', type: 'field' },
+        { label: 'Email', sub: 'info@meganntv.ks', type: 'field' },
         { label: 'Telefon', sub: '+383 44 100 200', type: 'field' },
         { label: 'Adresa', sub: 'Rruga Nënë Tereza 12, Prishtinë', type: 'field' },
       ]

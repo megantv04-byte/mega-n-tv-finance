@@ -193,8 +193,8 @@ Payment methods are intelligently normalized:
 ## Deposited To Normalization
 
 For payments, the "Deposited To" field recognizes:
-- `samki`, `Samki` → **Samki**
-- `enndy`, `endy`, `Enndy` → **Enndy** (Default)
+- `xxx`, `XXX` → **XXX**
+- `bledi`, `endy`, `Bledi` → **Bledi** (Default)
 - Any other value: kept as-is
 
 ---

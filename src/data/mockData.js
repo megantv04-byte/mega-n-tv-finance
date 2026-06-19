@@ -62,22 +62,22 @@ export const paymentModes = [
 ]
 
 export const depositAccounts = [
-  'Kesh - Enndy',
+  'Kesh - Bledi',
   'Kesh - Belti',
   'PayPal - Bledar',
   'PayPal - Shpend.be',
   'Wise - Belti',
-  'TEB - Enndy',
-  'Paysera - Enndy',
-  'OneFor - Enndy',
+  'TEB - Bledi',
+  'Paysera - Bledi',
+  'OneFor - Bledi',
   'Stripe - X',
   'Paysera - Belti',
   'PayPal - Me-Xhanin',
-  'PayPal - Megaenndy',
-  'Binance Enndy',
+  'PayPal - Megabledi',
+  'Binance Bledi',
 ]
 
-export const depositedToOptions = ['Enndy', 'Belti']
+export const depositedToOptions = ['Bledi', 'Belti']
 
 export const mockOrganizations = [
   {
@@ -93,7 +93,7 @@ export const mockOrganizations = [
 ]
 
 export const mockUsers = [
-  { id: 'USR-001', name: 'Enndy', username: 'xpmx',  password: 'enndy123', role: 'admin',  orgId: 'ORG-001', isSuperAdmin: true, active: true, createdAt: '2026-01-01', color: '#7c3aed' },
+  { id: 'USR-001', name: 'Bledi', username: 'xpmx',  password: 'bledi123', role: 'admin',  orgId: 'ORG-001', isSuperAdmin: true, active: true, createdAt: '2026-01-01', color: '#7c3aed' },
   { id: 'USR-002', name: 'Belti', username: 'belti', password: 'belti123', role: 'editor', orgId: 'ORG-001', active: true, createdAt: '2026-02-01', color: '#2563eb' },
   { id: 'USR-003', name: 'Belti', username: 'belti', password: 'belti123', role: 'editor', orgId: 'ORG-001', active: true, createdAt: '2026-03-01', color: '#059669' },
   { id: 'USR-004', name: 'Test',  username: 'test',  password: 'test',     role: 'tester', orgId: 'ORG-001', active: true, createdAt: '2026-01-01', color: '#6b7280' },

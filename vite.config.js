@@ -10,7 +10,7 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'icon.svg', 'apple-touch-icon-180x180.png'],
       workbox: {
-        cacheId: 'arestv-v1',
+        cacheId: 'meganntv-v1',
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
@@ -28,8 +28,8 @@ export default defineConfig({
         ]
       },
       manifest: {
-        name: 'AresTV Flow — Menaxhimi Financiar',
-        short_name: 'AresTV Flow',
+        name: 'MEGA N TV Flow — Menaxhimi Financiar',
+        short_name: 'MEGA N TV Flow',
         description: 'App moderne për menaxhimin e financave dhe faturave',
         theme_color: '#2563eb',
         background_color: '#ffffff',

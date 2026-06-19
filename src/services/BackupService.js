@@ -32,7 +32,7 @@ export function downloadBackup(appState) {
     const link = document.createElement('a')
     const timestamp = new Date().toISOString().slice(0, 10)
     link.href = url
-    link.download = `arestv-backup-${timestamp}.json`
+    link.download = `meganntv-backup-${timestamp}.json`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -107,7 +107,7 @@ export function parseBackupFile(file) {
 }
 
 // Auto-backup functions
-const AUTOBACKUP_KEY = 'arestv_autobackups'
+const AUTOBACKUP_KEY = 'meganntv_autobackups'
 const MAX_AUTOBACKUPS = 5 // Keep last 5 auto-backups
 
 export function createAutoBackup(appState) {
@@ -148,7 +148,7 @@ export function downloadAutoBackupToDisk(backup) {
     // Create timestamp for filename
     const now = new Date()
     const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5) // Format: YYYY-MM-DDTHH-mm-ss
-    const filename = `arestv-autobackup-${timestamp}.json`
+    const filename = `meganntv-autobackup-${timestamp}.json`
 
     // Create and trigger download
     const link = document.createElement('a')

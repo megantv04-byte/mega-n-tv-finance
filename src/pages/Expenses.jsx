@@ -72,7 +72,7 @@ export function ExpenseModal({ expense, onClose, isFormPage }) {
 
   const empty = {
     date: today, type: expenseTypes[0], vendor: '',
-    paidFrom: '', reference: '', paidBy: 'Enndy',
+    paidFrom: '', reference: '', paidBy: 'Bledi',
     recurring: false, recurringFreq: 'Mujore', amount: '',
   }
   const [form, setForm] = useState(isEdit ? { ...expense } : empty)
@@ -357,7 +357,7 @@ export default function ExpensesPage() {
   /* stats */
   const total      = filtered.reduce((s, e) => s + e.amount, 0)
   const allTotal   = expenses.reduce((s, e) => s + e.amount, 0)
-  const enndiTotal = expenses.filter(e => e.paidBy === 'Enndy').reduce((s, e) => s + e.amount, 0)
+  const enndiTotal = expenses.filter(e => e.paidBy === 'Bledi').reduce((s, e) => s + e.amount, 0)
   const beltiTotal = expenses.filter(e => e.paidBy === 'Belti').reduce((s, e) => s + e.amount, 0)
   const recurTotal = expenses.filter(e => e.recurring).reduce((s, e) => s + e.amount, 0)
 
@@ -453,7 +453,7 @@ export default function ExpensesPage() {
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
           <div className="flex items-center gap-1.5 mb-1">
             <Users size={13} className="text-blue-400" />
-            <p className="text-xs text-gray-400 font-medium">Enndy</p>
+            <p className="text-xs text-gray-400 font-medium">Bledi</p>
           </div>
           <p className="text-xl font-bold text-blue-500">- {fmt(enndiTotal)}</p>
           <p className="text-xs text-gray-400 mt-0.5">{Math.round(enndiTotal/allTotal*100)||0}% e totalit</p>
@@ -524,7 +524,7 @@ export default function ExpensesPage() {
         <select className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer"
           value={partnerFilt} onChange={e => { setPartner(e.target.value); setPg(1) }}>
           <option value="all">Të dy partnerët</option>
-          <option value="Enndy">Enndy</option>
+          <option value="Bledi">Bledi</option>
           <option value="Belti">Belti</option>
         </select>
 
@@ -580,7 +580,7 @@ export default function ExpensesPage() {
                     <p className="font-bold text-blue-500 text-sm">- {fmt(e.amount)}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{e.paidFrom || '—'}</p>
                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold mt-0.5 ${
-                      e.paidBy === 'Enndy' ? 'bg-blue-50 text-blue-500' : 'bg-purple-50 text-purple-600'
+                      e.paidBy === 'Bledi' ? 'bg-blue-50 text-blue-500' : 'bg-purple-50 text-purple-600'
                     }`}>
                       {e.paidBy || '—'}
                     </span>
@@ -706,7 +706,7 @@ export default function ExpensesPage() {
                   </td>
                   <td className="table-td">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                      e.paidBy === 'Enndy' ? 'bg-blue-50 text-blue-500' : 'bg-purple-50 text-purple-600'
+                      e.paidBy === 'Bledi' ? 'bg-blue-50 text-blue-500' : 'bg-purple-50 text-purple-600'
                     }`}>
                       {e.paidBy || '—'}
                     </span>
@@ -734,7 +734,7 @@ export default function ExpensesPage() {
           {filtered.length > 0 && (
             <div className="hidden sm:flex items-center justify-between px-5 py-3 border-t border-gray-100 bg-gray-50/40 text-xs">
               <div className="flex gap-4 text-gray-400">
-                <span>Enndy: <span className="font-bold text-blue-500">- {fmt(filtered.filter(e=>e.paidBy==='Enndy').reduce((s,e)=>s+e.amount,0))}</span></span>
+                <span>Bledi: <span className="font-bold text-blue-500">- {fmt(filtered.filter(e=>e.paidBy==='Bledi').reduce((s,e)=>s+e.amount,0))}</span></span>
                 <span>Belti: <span className="font-bold text-purple-600">- {fmt(filtered.filter(e=>e.paidBy==='Belti').reduce((s,e)=>s+e.amount,0))}</span></span>
               </div>
               <span className="font-semibold text-gray-500">
