@@ -90,12 +90,10 @@ export function AppProvider({ children }) {
       const saved = localStorage.getItem('meganntv_users')
       if (!saved) return mockUsers
       const stored = JSON.parse(saved)
-      // Sync immutable base fields from mockData (username, role, orgId, isSuperAdmin)
-      // so that changes in mockData always take effect even for existing stored users
       const merged = stored.map(u => {
         const base = mockUsers.find(m => m.id === u.id)
         if (!base) return u
-        return { ...u, username: base.username, role: base.role, orgId: base.orgId, isSuperAdmin: base.isSuperAdmin }
+        return { ...u, role: base.role, orgId: base.orgId, isSuperAdmin: base.isSuperAdmin }
       })
       const storedIds = new Set(stored.map(u => u.id))
       const missing = mockUsers.filter(u => !storedIds.has(u.id))
@@ -331,7 +329,7 @@ export function AppProvider({ children }) {
         const merged = supaUsers.map(u => {
           const base = mockUsers.find(m => m.id === u.id)
           if (!base) return u
-          return { ...u, username: base.username, role: base.role, orgId: base.orgId, isSuperAdmin: base.isSuperAdmin }
+          return { ...u, role: base.role, orgId: base.orgId, isSuperAdmin: base.isSuperAdmin }
         })
         const supaIds     = new Set(supaUsers.map(u => u.id))
         const deletedIds  = new Set(supaUsers.filter(u => u.deleted).map(u => u.id))

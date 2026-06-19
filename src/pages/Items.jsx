@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react'
-import { Package, Plus, Search, Pencil, Trash2, X, ChevronUp, ChevronDown, Lock, Unlock } from 'lucide-react'
+import { Package, Plus, Search, Pencil, Trash2, X, ChevronUp, ChevronDown } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Modal, FormGroup, EmptyState, Pagination } from '../components/UI'
 import FormPageWrapper from '../components/FormPageWrapper'
@@ -7,56 +7,6 @@ import { salesAccounts } from '../data/mockData'
 
 /* ─── helpers ───────────────────────────────────────────── */
 const PER_PAGE = 10
-const COST_PIN = '2823'
-
-/* ─── PIN Modal ─────────────────────────────────────────── */
-function PinModal({ onSuccess, onClose }) {
-  const [pin, setPin] = useState('')
-  const [err, setErr] = useState(false)
-
-  const attempt = () => {
-    if (pin === COST_PIN) { onSuccess(); onClose() }
-    else { setErr(true); setPin('') }
-  }
-
-  return (
-    <Modal
-      title={
-        <span className="flex items-center gap-2">
-          <Lock size={16} className="text-gray-500" />
-          Fut PIN-in për të parë çmimet
-        </span>
-      }
-      onClose={onClose}
-      footer={
-        <>
-          <button className="btn btn-outline" onClick={onClose}>Anulo</button>
-          <button className="btn btn-primary btn-sm self-start sm:self-auto" onClick={attempt} disabled={pin.length !== 4}>
-            Konfirmo
-          </button>
-        </>
-      }
-    >
-      <p className="text-xs text-gray-400 mb-4">Fut kodin 4-shifror për të zbuluar çmimin e blerjes dhe marzhën.</p>
-      <div className="flex justify-center">
-        <input
-          className="form-control text-center text-2xl font-mono tracking-[0.5em] w-40"
-          type="password"
-          maxLength={4}
-          inputMode="numeric"
-          value={pin}
-          onChange={e => { setPin(e.target.value.replace(/\D/g, '')); setErr(false) }}
-          onKeyDown={e => e.key === 'Enter' && pin.length === 4 && attempt()}
-          autoFocus
-          placeholder="••••"
-        />
-      </div>
-      {err && (
-        <p className="text-xs text-blue-500 text-center mt-3 font-semibold">PIN i gabuar. Provo përsëri.</p>
-      )}
-    </Modal>
-  )
-}
 
 function accountLabel(code) {
   const acc = salesAccounts.find(a => a.code === code)
@@ -246,12 +196,10 @@ function DeleteConfirm({ item, onClose }) {
 export default function Items() {
   const { items, closeModal, fmt, page, navigate } = useApp()
 
-  const [search,      setSearch]      = useState('')
-  const [pg,          setPg]          = useState(1)
-  const [sortKey,     setSortKey]     = useState('name')
-  const [sortDir,     setSortDir]     = useState('asc')
-  const [pinUnlocked, setPinUnlocked] = useState(false)
-  const [showPin,     setShowPin]     = useState(false)
+  const [search,  setSearch]  = useState('')
+  const [pg,      setPg]      = useState(1)
+  const [sortKey, setSortKey] = useState('name')
+  const [sortDir, setSortDir] = useState('asc')
 
   // Detect if we're in form mode (page like "items:create" or "items:ID:edit")
   const pageMatch = page.split(':')
@@ -265,11 +213,6 @@ export default function Items() {
       closeModal()
     }
   }, [isFormMode, closeModal])
-
-  const handleLockToggle = () => {
-    if (pinUnlocked) setPinUnlocked(false)
-    else setShowPin(true)
-  }
 
   /* kërkim */
   const filtered = items.filter(i =>
@@ -348,14 +291,6 @@ export default function Items() {
         </button>
       </div>
 
-      {/* PIN modal */}
-      {showPin && (
-        <PinModal
-          onSuccess={() => setPinUnlocked(true)}
-          onClose={() => setShowPin(false)}
-        />
-      )}
-
       {/* Stat mini-cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
@@ -366,21 +301,9 @@ export default function Items() {
           <p className="text-2xl font-bold text-blue-500">{fmt(avgSale.toFixed(2))}</p>
           <p className="text-xs text-gray-400 mt-0.5 font-medium">Çmimi mesatar shitje</p>
         </div>
-        <div
-          className="bg-white rounded-xl border border-gray-100 px-5 py-4 cursor-pointer hover:border-gray-200 transition-colors"
-          onClick={() => !pinUnlocked && setShowPin(true)}
-        >
-          {pinUnlocked
-            ? <p className="text-2xl font-bold text-emerald-600">{avgMargin.toFixed(1)}%</p>
-            : <p className="text-2xl font-bold text-gray-300 font-mono tracking-widest select-none">••••</p>
-          }
-          <p className="text-xs text-gray-400 mt-0.5 font-medium flex items-center gap-1">
-            Marzha mesatare
-            {pinUnlocked
-              ? <Unlock size={10} className="text-emerald-400"/>
-              : <Lock size={10} className="text-gray-300"/>
-            }
-          </p>
+        <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
+          <p className="text-2xl font-bold text-emerald-600">{avgMargin.toFixed(1)}%</p>
+          <p className="text-xs text-gray-400 mt-0.5 font-medium">Marzha mesatare</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 px-5 py-4">
           <p className="text-2xl font-bold text-gray-800">{withVendor}</p>
@@ -443,33 +366,12 @@ export default function Items() {
                   </button>
                 </th>
                 <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide">
-                  <div className="flex items-center justify-end gap-1.5">
-                    {pinUnlocked && (
-                      <button
-                        className="flex items-center gap-1 hover:text-gray-700 transition-colors"
-                        onClick={() => toggleSort('purchasePrice')}
-                      >
-                        Çm. Blerjes <SortIcon k="purchasePrice" />
-                      </button>
-                    )}
-                    {!pinUnlocked && <span>Çm. Blerjes</span>}
-                    <button
-                      className={`ml-1 p-0.5 rounded transition-colors ${pinUnlocked ? 'text-emerald-500 hover:text-emerald-600' : 'text-gray-300 hover:text-gray-500'}`}
-                      onClick={handleLockToggle}
-                      title={pinUnlocked ? 'Mbyll' : 'Hap me PIN'}
-                    >
-                      {pinUnlocked ? <Unlock size={11}/> : <Lock size={11}/>}
-                    </button>
-                  </div>
+                  <button className="flex items-center gap-1 hover:text-gray-700 transition-colors ml-auto" onClick={() => toggleSort('purchasePrice')}>
+                    Çm. Blerjes <SortIcon k="purchasePrice" />
+                  </button>
                 </th>
                 <th className="text-right px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide hidden md:table-cell">
-                  <div className="flex items-center justify-end gap-1">
-                    Marzha
-                    {pinUnlocked
-                      ? <Unlock size={10} className="text-emerald-400 ml-0.5"/>
-                      : <Lock size={10} className="text-gray-300 ml-0.5"/>
-                    }
-                  </div>
+                  Marzha
                 </th>
                 <th className="text-left px-5 py-3 font-semibold text-gray-500 text-xs uppercase tracking-wide hidden lg:table-cell">
                   Llogaria Kontabel
@@ -510,25 +412,21 @@ export default function Items() {
 
                     {/* Çmimi blerjes */}
                     <td className="px-5 py-3.5 text-right">
-                      {pinUnlocked
-                        ? item.purchasePrice > 0
-                          ? <span className="text-gray-600">{fmt(item.purchasePrice)}</span>
-                          : <span className="text-gray-300">—</span>
-                        : <span onClick={() => setShowPin(true)}>{masked}</span>
+                      {item.purchasePrice > 0
+                        ? <span className="text-gray-600">{fmt(item.purchasePrice)}</span>
+                        : <span className="text-gray-300">—</span>
                       }
                     </td>
 
                     {/* Marzha */}
                     <td className="px-5 py-3.5 text-right hidden md:table-cell">
-                      {pinUnlocked
-                        ? margin !== null
-                          ? <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                              Number(margin) >= 30 ? 'bg-emerald-50 text-emerald-600'
-                              : Number(margin) >= 10 ? 'bg-yellow-50 text-yellow-600'
-                              : 'bg-blue-50 text-blue-500'
-                            }`}>{margin}%</span>
-                          : <span className="text-gray-300 text-xs">—</span>
-                        : <span onClick={() => setShowPin(true)}>{masked}</span>
+                      {margin !== null
+                        ? <span className={`text-xs font-bold px-2 py-1 rounded-full ${
+                            Number(margin) >= 30 ? 'bg-emerald-50 text-emerald-600'
+                            : Number(margin) >= 10 ? 'bg-yellow-50 text-yellow-600'
+                            : 'bg-blue-50 text-blue-500'
+                          }`}>{margin}%</span>
+                        : <span className="text-gray-300 text-xs">—</span>
                       }
                     </td>
 

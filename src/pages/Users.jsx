@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react'
 import {
   UserCog, Plus, Pencil, Trash2, Shield, Edit3,
   Eye, EyeOff, CheckCircle, XCircle, Clock, Package,
-  Search, X, Filter,
+  Search, X, Filter, Eraser,
 } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import { Modal, FormGroup, EmptyState } from '../components/UI'
+import { supabase } from '../lib/supabase'
 
 const ROLE_META = {
   admin:  { label: 'Admin',  cls: 'bg-blue-50 text-blue-600 border border-blue-100',       icon: Shield },
@@ -184,7 +185,7 @@ function UserModal({ user, onClose }) {
    Faqja kryesore
 ══════════════════════════════════════════════════════════ */
 export default function UsersPage() {
-  const { users, setUsers, setModal, closeModal, showToast, currentUser, activityLog } = useApp()
+  const { users, setUsers, setModal, closeModal, showToast, currentUser, activityLog, setActivityLog } = useApp()
 
   /* ── Activity log filter state ── */
   const [logSearch,     setLogSearch]     = useState('')
@@ -316,6 +317,20 @@ export default function UsersPage() {
               {filteredLog.length} / {activityLog.length}
             </span>
           </div>
+          {activityLog.length > 0 && currentUser?.role === 'admin' && (
+            <button
+              className="flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors font-medium"
+              onClick={async () => {
+                if (!window.confirm('A je i sigurt që dëshiron të fshish gjithë historinë?')) return
+                setActivityLog([])
+                localStorage.removeItem('meganntv_activity_log')
+                if (supabase) await supabase.from('activities').delete().neq('id', '')
+                showToast('Historia u fshi! ✓', 'success')
+              }}
+            >
+              <Eraser size={13} /> Fshi historinë
+            </button>
+          )}
 
           {/* Filters */}
           <div className="flex items-center gap-2 flex-wrap">
