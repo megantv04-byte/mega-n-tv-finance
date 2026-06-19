@@ -670,7 +670,7 @@ export default function Invoices() {
   console.log('🆕 PARTIAL PAYMENTS SYSTEM LOADED - Invoices.jsx updated')
   const {
     invoices, setInvoices,
-    customers,
+    customers, payments,
     setModal, closeModal,
     showToast, fmt,
     currentOrgId, currentOrg,
@@ -1055,9 +1055,18 @@ export default function Invoices() {
   const paged = sorted.slice((paginationPage - 1) * perPage, paginationPage * perPage)
 
   /* Calculate stats - based on filtered invoices */
+  // Helper: shuma e paguar për një faturë
+  const paidForInvoice = (invId) =>
+    payments.filter(p => p.invoiceId === invId).reduce((s, p) => s + Number(p.amount || 0), 0)
+
   const pendingValue = filtered
-    .filter(i => i.status === 'pending')
-    .reduce((sum, i) => sum + (i.amount || 0), 0)
+    .filter(i => i.status === 'pending' || i.status === 'partial')
+    .reduce((sum, i) => {
+      const remaining = i.status === 'partial'
+        ? Math.max(0, (i.amount || 0) - paidForInvoice(i.id))
+        : (i.amount || 0)
+      return sum + remaining
+    }, 0)
   const overdueValue = filtered
     .filter(i => i.status === 'overdue' || (i.status === 'pending' && i.due && i.due < today))
     .reduce((sum, i) => sum + (i.amount || 0), 0)
