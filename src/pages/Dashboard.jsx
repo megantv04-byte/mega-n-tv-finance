@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import {
   Users, TrendingUp, TrendingDown, Clock, FilePlus,
-  UserPlus, ReceiptText, AlertCircle, UserCheck, Layers,
+  UserPlus, ReceiptText, AlertCircle, UserCheck, Layers, X,
 } from 'lucide-react'
 import {
   ComposedChart, Bar, Line, PieChart, Pie, Cell,
@@ -27,10 +27,13 @@ const CAT_COLORS = {
 }
 
 /* ── Stat card komponent ── */
-function KpiCard({ icon: Icon, iconBg, iconColor, label, value, sub, subColor = 'text-gray-400', accent }) {
+function KpiCard({ icon: Icon, iconBg, iconColor, label, value, sub, subColor = 'text-gray-400', accent, onClick }) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-3 hover:shadow-md transition-all duration-200 ${accent ? `border-l-4` : ''}`}
-      style={accent ? { borderLeftColor: iconColor } : {}}>
+    <div
+      onClick={onClick}
+      className={`bg-white rounded-2xl border border-gray-100 p-4 flex items-start gap-3 transition-all duration-200 hover:shadow-md ${accent ? 'border-l-4' : ''} ${onClick ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.99]' : ''}`}
+      style={accent ? { borderLeftColor: iconColor } : {}}
+    >
       <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: iconBg }}>
         <Icon size={16} style={{ color: iconColor }} />
       </div>
@@ -38,6 +41,67 @@ function KpiCard({ icon: Icon, iconBg, iconColor, label, value, sub, subColor = 
         <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider truncate">{label}</p>
         <p className="text-lg font-bold text-gray-900 mt-0.5 truncate">{value}</p>
         {sub && <p className={`text-[11px] mt-0.5 font-medium truncate ${subColor}`}>{sub}</p>}
+        {onClick && <p className="text-[10px] text-blue-400 mt-1 font-medium">Kliko për detaje →</p>}
+      </div>
+    </div>
+  )
+}
+
+/* ── Drill-down drawer ── */
+function DrillDrawer({ drill, onClose, fmt }) {
+  if (!drill) return null
+  const { title, rows, columns } = drill
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <h3 className="font-bold text-gray-800 text-base">{title}</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-700">
+            <X size={18} />
+          </button>
+        </div>
+        {/* Count */}
+        <div className="px-5 py-2 text-xs text-gray-400 border-b border-gray-50">
+          {rows.length} rekorde
+        </div>
+        {/* Table */}
+        <div className="flex-1 overflow-y-auto">
+          {rows.length === 0 ? (
+            <div className="flex items-center justify-center h-32 text-gray-400 text-sm">Nuk ka të dhëna</div>
+          ) : (
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
+                <tr>
+                  {columns.map(col => (
+                    <th key={col.key} className={`px-4 py-2.5 text-left font-semibold text-gray-500 uppercase tracking-wide text-[10px] ${col.right ? 'text-right' : ''}`}>
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, i) => (
+                  <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
+                    {columns.map(col => (
+                      <td key={col.key} className={`px-4 py-3 ${col.right ? 'text-right font-semibold' : ''} ${col.color ? col.color(row) : 'text-gray-700'}`}>
+                        {col.render ? col.render(row, fmt) : row[col.key]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        {/* Footer total */}
+        {rows.length > 0 && drill.total != null && (
+          <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 flex justify-between items-center">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</span>
+            <span className="text-base font-bold text-gray-900">{fmt(drill.total)}</span>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -180,6 +244,36 @@ export default function Dashboard() {
   const openCustomerModal = () => setModal(<CustomerModal onClose={closeModal} />)
   const openExpenseModal  = () => setModal(<ExpenseModal  onClose={closeModal} />)
 
+  /* ── Drill state ── */
+  const [drill, setDrill] = useState(null)
+
+  const INV_COLS = [
+    { key: 'customer', label: 'Klienti' },
+    { key: 'date',     label: 'Data' },
+    { key: 'status',   label: 'Statusi', render: (r) => (
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.status === 'overdue' ? 'bg-red-100 text-red-600' : r.status === 'partial' ? 'bg-blue-100 text-blue-600' : 'bg-amber-100 text-amber-600'}`}>
+        {r.status === 'overdue' ? 'Vonesë' : r.status === 'partial' ? 'Pjesërisht' : 'Pritje'}
+      </span>
+    )},
+    { key: 'amount', label: 'Shuma', right: true, render: (r, f) => f(r.amount) },
+  ]
+
+  const PAY_COLS = [
+    { key: 'customer', label: 'Klienti' },
+    { key: 'date',     label: 'Data' },
+    { key: 'method',   label: 'Metoda' },
+    { key: 'amount',   label: 'Shuma', right: true, render: (r, f) => f(r.amount) },
+  ]
+
+  const EXP_COLS = [
+    { key: 'description', label: 'Përshkrimi' },
+    { key: 'date',        label: 'Data' },
+    { key: 'category',    label: 'Kategoria' },
+    { key: 'amount',      label: 'Shuma', right: true, render: (r, f) => f(r.amount) },
+  ]
+
+  const openDrill = (title, rows, columns, total) => setDrill({ title, rows, columns, total })
+
   return (
     <div className="space-y-6 max-w-5xl">
 
@@ -221,28 +315,48 @@ export default function Dashboard() {
           {/* 6 KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
             <KpiCard icon={UserCheck}   iconBg="#ecfdf5" iconColor="#059669" accent
-              label="Klientë aktivë"        value={activeClients}
+              label="Klientë aktivë" value={activeClients}
               sub="Abonime aktive"
             />
             <KpiCard icon={TrendingUp}  iconBg="#eff6ff" iconColor="#2563eb" accent
               label={`Të ardhura ${thisYear}`} value={fmt(yearRevenue)}
               sub={`Pagesa ${thisYear}`}
+              onClick={() => {
+                const rows = payments.filter(p => p.date?.startsWith(thisYear)).sort((a,b) => b.date?.localeCompare(a.date))
+                openDrill(`Të ardhura ${thisYear}`, rows, PAY_COLS, yearRevenue)
+              }}
             />
             <KpiCard icon={TrendingDown} iconBg="#fef2f2" iconColor="#dc2626" accent
-              label={`Shpenzime ${thisYear}`}  value={fmt(yearExpenses)}
-              sub="Shpenzime të regjistruara"  subColor="text-red-400"
+              label={`Shpenzime ${thisYear}`} value={fmt(yearExpenses)}
+              sub="Shpenzime të regjistruara" subColor="text-red-400"
+              onClick={() => {
+                const rows = expenses.filter(e => e.date?.startsWith(thisYear)).sort((a,b) => b.date?.localeCompare(a.date))
+                openDrill(`Shpenzime ${thisYear}`, rows, EXP_COLS, yearExpenses)
+              }}
             />
             <KpiCard icon={Clock}        iconBg="#fffbeb" iconColor="#d97706" accent
-              label="Pritje — Klient"      value={fmt(pendingKlientAmt)}
+              label="Pritje — Klient" value={fmt(pendingKlientAmt)}
               sub={`${pendingKlient.length} fatura`} subColor="text-amber-500"
+              onClick={() => {
+                const rows = [...pendingKlient].sort((a,b) => a.date?.localeCompare(b.date))
+                openDrill('Fatura në pritje — Klientë individualë', rows, INV_COLS, pendingKlientAmt)
+              }}
             />
             <KpiCard icon={Layers}       iconBg="#f5f3ff" iconColor="#7c3aed" accent
-              label="Pritje — Reseller"    value={fmt(pendingResellerAmt)}
+              label="Pritje — Reseller" value={fmt(pendingResellerAmt)}
               sub={`${pendingReseller.length} fatura`} subColor="text-purple-500"
+              onClick={() => {
+                const rows = [...pendingReseller].sort((a,b) => a.date?.localeCompare(b.date))
+                openDrill('Fatura në pritje — Reseller', rows, INV_COLS, pendingResellerAmt)
+              }}
             />
             <KpiCard icon={AlertCircle}  iconBg="#fff7ed" iconColor="#ea580c" accent
-              label="Pritje — Total"       value={fmt(pendingTotalAmt)}
+              label="Pritje — Total" value={fmt(pendingTotalAmt)}
               sub={`${pendingInvoices.length} fatura gjithsej`} subColor="text-orange-500"
+              onClick={() => {
+                const rows = [...pendingInvoices].sort((a,b) => a.date?.localeCompare(b.date))
+                openDrill('Të gjitha faturat në pritje', rows, INV_COLS, pendingTotalAmt)
+              }}
             />
           </div>
 
@@ -297,6 +411,8 @@ export default function Dashboard() {
         </div>
 
       </div>
+
+      <DrillDrawer drill={drill} onClose={() => setDrill(null)} fmt={fmt} />
 
     </div>
   )
